@@ -115,6 +115,10 @@ sobre las palabras clave.
     00000010 & 0x02       &  LOAD M(X)        & $[AC]\leftarrow[X]$\\
     00000011 & 0x03       &  LOAD |M(X)|      & $[AC]\leftarrow|[X]|$\\
     00000100 & 0x04       &  LOAD -|M(X)|     & $[AC]\leftarrow-|[X]|$\\
+    00000001 & 0x01       &  LOAD M(X)        & $[AC]\leftarrow[X]$\\
+    00000110 & 0x06       &  SUB M(X)         & $[AC]\leftarrow[AC]-[X]$\\
+    00010100 & 0x14       &  LSH              & $[AC]\leftarrow[AC]*2$\\
+    01100011 & 0x99       &  HALT
     \hline
   \end{tabular}
 \end{table}
@@ -156,20 +160,25 @@ RTL.
 1. ¿Qué resultado se tiene al final en el registro del acumulador?
 
    Respuesta:
-   $[AC] \leftarrow ???$
+   $[AC] \leftarrow 3$
 
 2. ¿Se sobrescribe algún registro como resultado de la ejecución? Si
    es verdadero, indique qué registro y con qué valor.
    Respuesta:
-   - $[940] \leftarrow ???$
-   - $[941] \leftarrow ???$
-   - $[AC] \leftarrow ???$
+   - $[940] \leftarrow 3$
+   - $[941] \leftarrow 6$
+   - $[AC] \leftarrow 3$
 
 3. ¿Cuál es el valor del bit de Carry? ¿Qué operación modifica el bit?
    Respuesta:
-   - $Carry = ???$
+   - $Carry = 0$
 
-   - 
+   - Le corresponde a LSH en la instrucción 14, esta operación desplaza todos los bits una posición
+     hacia la izquiera, al realizar este desplazamiento, el valor almacenado en el acumulador se
+     multiplica por 2, como antes de ejecutar LSH el acumulador tenía el valor 3, en binario corresponde
+     0011, al desplazar los bits una posición a la izquierda se obtiene 0110, que equivale a 6 en decimal.
+     por esta razón después de ejecutar LSH el acumulador pasa de 3 a 6, además también modifica el bit carry, en
+     este caso, ningún bit salió del registro, por lo que el valor del carry es 0.
 
 *** Código RTL
 
@@ -205,14 +214,14 @@ HALT            ; 0x303 der -> fin del programa
 
 Complete la información de los integrantes del grupo.
 
-|----------------+---------------------------+-------------------------------------------|
-| Nombre         | Email                     | Rol                                       |
-|----------------+---------------------------+-------------------------------------------|
-|                |                           |                                           |
-|                |                           |                                           |
-| Micaela Sagñay | micaela.sagnay@epn.edu.ec | Codigo RTL y Assembler, tramo dir. 0x303, |
-|                |                           | exportacion PDF y entrega.                |
-|----------------+---------------------------+-------------------------------------------|
+|----------------+---------------------------+---------------------------------------------|
+| Nombre         | Email                     | Rol                                         |
+|----------------+---------------------------+---------------------------------------------|
+|                |                           |                                             |
+| Jhanavi Molina | jhanavi.molina@epn.edu.ec | Resultado AC, registros sobrescritos, carry |
+| Micaela Sagñay | micaela.sagnay@epn.edu.ec | Codigo RTL y Assembler, tramo dir. 0x303,   |
+|                |                           | exportacion PDF y entrega.                  |
+|----------------+---------------------------+---------------------------------------------|
 
 * Verificación de Entregables [0%]
 
