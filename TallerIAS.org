@@ -176,8 +176,14 @@ RTL.
 Escriba en notación de transferencia de registros el programa que
 ejecuta el computador IAS.
 
- - $[AC] \leftarrow [940]$
- - ...
+ - $[AC] \leftarrow [M(940)]$
+ - $[AC] \leftarrow [AC] - [M(941)]$
+ - $[M(940)] \leftarrow [AC]$
+ - $[AC] \leftarrow 2 \times [AC]$
+ - $[M(941)] \leftarrow [AC]$
+ - $[AC] \leftarrow [M(940)]$
+ - $[M(940)] \leftarrow [AC]$
+ - $\text{HALT}$
 
 
 *** Código Assembler
@@ -185,21 +191,28 @@ ejecuta el computador IAS.
 Escriba el código Assembler del programa que ejecuta el computador IAS.
 
 #+begin_src
-LOAD M(940)
-
+LOAD M(940)     ; 0x300 izq -> [AC] = 5
+SUB M(941)      ; 0x300 der -> [AC] = 5 - 2 = 3
+STOR M(940)     ; 0x301 izq -> [940] = 3
+LSH             ; 0x301 der -> [AC] = 3 * 2 = 6
+STOR M(941)     ; 0x302 izq -> [941] = 6
+LOAD M(940)     ; 0x302 der -> [AC] = 3
+STOR M(940)     ; 0x303 izq -> [940] = 3
+HALT            ; 0x303 der -> fin del programa
 #+end_src
 
 * Equipo de Trabajo
 
 Complete la información de los integrantes del grupo.
 
-|-----------------+-------------------------+-------------|
-| Nombre          | Email                   | Rol         |
-|-----------------+-------------------------+-------------|
-|                 |                         |             |
-|                 |                         |             |
-|                 |                         |             |
-|-----------------+-------------------------+-------------|
+|----------------+---------------------------+-------------------------------------------|
+| Nombre         | Email                     | Rol                                       |
+|----------------+---------------------------+-------------------------------------------|
+|                |                           |                                           |
+|                |                           |                                           |
+| Micaela Sagñay | micaela.sagnay@epn.edu.ec | Codigo RTL y Assembler, tramo dir. 0x303, |
+|                |                           | exportacion PDF y entrega.                |
+|----------------+---------------------------+-------------------------------------------|
 
 * Verificación de Entregables [0%]
 
