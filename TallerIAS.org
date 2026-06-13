@@ -6,9 +6,9 @@
 
 #+title: Taller — Máquina IAS / Von Neumann
 #+subtitle: ICCD332 Arquitectura de Computadores
-#+author: [Nombres de los integrantes del grupo]
-#+email: lenin.falconi@epn.edu.ec
-#+date: [Fecha de entrega]
+#+author: Almeida Anthonny, Sagñay Micaela y Molina Jhanavi
+#+email: anthonny.almeida@epn.edu.ec, micaela.sagñay@epn.edu.ec, jhanavi.molina@epn.edu.ec
+#+date: 2026-06-12
 #+language: es
 #+creator: Emacs 27.1 (Org mode 9.7.5)
 #+cite_export: biblatex
@@ -160,25 +160,24 @@ RTL.
 1. ¿Qué resultado se tiene al final en el registro del acumulador?
 
    Respuesta:
-   $[AC] \leftarrow 3$
+   $[AC] \leftarrow 0000000003$
 
 2. ¿Se sobrescribe algún registro como resultado de la ejecución? Si
    es verdadero, indique qué registro y con qué valor.
    Respuesta:
-   - $[940] \leftarrow 3$
-   - $[941] \leftarrow 6$
-   - $[AC] \leftarrow 3$
+   - $[940] \leftarrow 0000000003$
+   - $[941] \leftarrow 0000000006$
+   - $[AC] \leftarrow 0000000003$
 
 3. ¿Cuál es el valor del bit de Carry? ¿Qué operación modifica el bit?
    Respuesta:
-   - $Carry = 0$
+   - $Carry = 1$
 
    - Le corresponde a LSH en la instrucción 14, esta operación desplaza todos los bits una posición
      hacia la izquiera, al realizar este desplazamiento, el valor almacenado en el acumulador se
      multiplica por 2, como antes de ejecutar LSH el acumulador tenía el valor 3, en binario corresponde
-     0011, al desplazar los bits una posición a la izquierda se obtiene 0110, que equivale a 6 en decimal.
-     por esta razón después de ejecutar LSH el acumulador pasa de 3 a 6, además también modifica el bit carry, en
-     este caso, ningún bit salió del registro, por lo que el valor del carry es 0.
+     0011, al desplazar los bits una posición a la izquierda se obtiene 0110, que equivale a 6 en decimal,
+     por esta razón después de ejecutar LSH el acumulador pasa de 3 a 6.
 
 *** Código RTL
 
@@ -200,13 +199,13 @@ ejecuta el computador IAS.
 Escriba el código Assembler del programa que ejecuta el computador IAS.
 
 #+begin_src
-LOAD M(940)     ; 0x300 izq -> [AC] = 5
-SUB M(941)      ; 0x300 der -> [AC] = 5 - 2 = 3
-STOR M(940)     ; 0x301 izq -> [940] = 3
-LSH             ; 0x301 der -> [AC] = 3 * 2 = 6
-STOR M(941)     ; 0x302 izq -> [941] = 6
-LOAD M(940)     ; 0x302 der -> [AC] = 3
-STOR M(940)     ; 0x303 izq -> [940] = 3
+LOAD M(940)     ; 0x300 izq -> [AC] = 0000000005
+SUB M(941)      ; 0x300 der -> [AC] = 0000000005 - 0000000002 = 0000000003
+STOR M(940)     ; 0x301 izq -> [940] = 0000000003
+LSH             ; 0x301 der -> [AC] = 0000000003 * 2 = 0000000006
+STOR M(941)     ; 0x302 izq -> [941] = 0000000006
+LOAD M(940)     ; 0x302 der -> [AC] = 0000000003
+STOR M(940)     ; 0x303 izq -> [940] = 0000000003
 HALT            ; 0x303 der -> fin del programa
 #+end_src
 
@@ -214,28 +213,28 @@ HALT            ; 0x303 der -> fin del programa
 
 Complete la información de los integrantes del grupo.
 
-|----------------+---------------------------+---------------------------------------------|
-| Nombre         | Email                     | Rol                                         |
-|----------------+---------------------------+---------------------------------------------|
-|                |                           |                                             |
-| Jhanavi Molina | jhanavi.molina@epn.edu.ec | Resultado AC, registros sobrescritos, carry |
-| Micaela Sagñay | micaela.sagnay@epn.edu.ec | Codigo RTL y Assembler, tramo dir. 0x303,   |
-|                |                           | exportacion PDF y entrega.                  |
-|----------------+---------------------------+---------------------------------------------|
+|------------------+-----------------------------+---------------------------------------------|
+| Nombre           | Email                       | Rol                                         |
+|------------------+-----------------------------+---------------------------------------------|
+| Anthonny Almeida | anthonny.almeida@epn.edu.ec | Tabla de instrucciones IAS, tramo dir 0x300 |
+| Jhanavi Molina   | jhanavi.molina@epn.edu.ec   | Resultado AC, registros sobrescritos, carry |
+| Micaela Sagñay   | micaela.sagnay@epn.edu.ec   | Codigo RTL y Assembler, tramo dir. 0x303,   |
+|                  |                             | exportacion PDF y entrega.                  |
+|------------------+-----------------------------+---------------------------------------------|
 
-* Verificación de Entregables [0%]
+* Verificación de Entregables [100%]
 
 Ejecute ~C-c C-c~ sobre los ítems de tarea según se hayan cumplido o
 no. Si un ítem no pudo realizarse, anote en la sección de problemas
 las razones.
 
-- [ ] Tabla de instrucciones IAS completada.
-- [ ] Preguntas del ejercicio respondidas.
-- [ ] Código RTL completo.
-- [ ] Código Assembler completo.
-- [ ] Revisión de ortografía con ~ispell-buffer~.
-- [ ] Exportación a PDF con ~M-x org-latex-export-to-pdf~.
-- [ ] Subir al aula virtual archivo ~.org~ y ~.pdf~.
+- [X] Tabla de instrucciones IAS completada.
+- [X] Preguntas del ejercicio respondidas.
+- [X] Código RTL completo.
+- [X] Código Assembler completo.
+- [X] Revisión de ortografía con ~ispell-buffer~.
+- [X] Exportación a PDF con ~M-x org-latex-export-to-pdf~.
+- [X] Subir al aula virtual archivo ~.org~ y ~.pdf~.
 
 ** Problemas con la tarea / logísticos
 
