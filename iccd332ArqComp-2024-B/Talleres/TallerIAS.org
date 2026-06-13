@@ -6,9 +6,9 @@
 
 #+title: Taller — Máquina IAS / Von Neumann
 #+subtitle: ICCD332 Arquitectura de Computadores
-#+author: [Nombres de los integrantes del grupo]
-#+email: lenin.falconi@epn.edu.ec
-#+date: [Fecha de entrega]
+#+author: Almeida Anthonny, Sagñay Micaela, Molina Jhanavi y Haro Damian
+#+email: anthonny.almeida@epn.edu.ec, micaela.sagñay@epn.edu.ec, jhanavi.molina@epn.edu.ec, damian.haro@epn.edu.ec
+#+date: 2026-06-12
 #+language: es
 #+creator: Emacs 27.1 (Org mode 9.7.5)
 #+cite_export: biblatex
@@ -109,12 +109,32 @@ sobre las palabras clave.
   \begin{tabular}{|cccc|}
     \hline
     Opcode   & Opcode Hex &  Símbolo          & RTL \\ \hline
+    \multicolumn{4}{|l|}{\textit{Transferencia de datos}} \\ \hline
     00001010 & 0x0A       &  LOAD MQ          & $[AC]\leftarrow[MQ]$\\
     00001001 & 0x09       &  LOAD MQ, M(X)    & $[MQ]\leftarrow[X]$\\
     00100001 & 0x21       &  STOR M(X)        & $[X]\leftarrow[AC]$\\
-    00000010 & 0x02       &  LOAD M(X)        & $[AC]\leftarrow[X]$\\
+    00000001 & 0x01       &  LOAD M(X)        & $[AC]\leftarrow[X]$\\
+    00000010 & 0x02       &  LOAD -M(X)       & $[AC]\leftarrow-[X]$\\
     00000011 & 0x03       &  LOAD |M(X)|      & $[AC]\leftarrow|[X]|$\\
-    00000100 & 0x04       &  LOAD -|M(X)|     & $[AC]\leftarrow-|[X]|$\\
+    00000100 & 0x04       &  LOAD -|M(X)|     & $[AC]\leftarrow-|[X]|$\\ \hline
+    \multicolumn{4}{|l|}{\textit{Salto incondicional}} \\ \hline
+    00001101 & 0x0D       &  JUMP M(X,0:19)   & $[PC]\leftarrow$ M(X) izq.\\
+    00001110 & 0x0E       &  JUMP M(X,20:39)  & $[PC]\leftarrow$ M(X) der.\\ \hline
+    \multicolumn{4}{|l|}{\textit{Salto condicional}} \\ \hline
+    00001111 & 0x0F       &  JUMP+ M(X,0:19)  & $\text{si }[AC]\geq 0:\ [PC]\leftarrow$ M(X) izq.\\
+    00010000 & 0x10       &  JUMP+ M(X,20:39) & $\text{si }[AC]\geq 0:\ [PC]\leftarrow$ M(X) der.\\ \hline
+    \multicolumn{4}{|l|}{\textit{Aritmética}} \\ \hline
+    00000101 & 0x05       &  ADD M(X)         & $[AC]\leftarrow[AC]+[X]$\\
+    00000111 & 0x07       &  ADD |M(X)|       & $[AC]\leftarrow[AC]+|[X]|$\\
+    00000110 & 0x06       &  SUB M(X)         & $[AC]\leftarrow[AC]-[X]$\\
+    00001000 & 0x08       &  SUB |M(X)|       & $[AC]\leftarrow[AC]-|[X]|$\\
+    00001011 & 0x0B       &  MUL M(X)         & $[AC,MQ]\leftarrow[MQ]\times[X]$\\
+    00001100 & 0x0C       &  DIV M(X)         & $[MQ]\leftarrow[AC]/[X];\ [AC]\leftarrow$ resto\\
+    00010100 & 0x14       &  LSH              & $[AC]\leftarrow 2\times[AC]$\\
+    00010101 & 0x15       &  RSH              & $[AC]\leftarrow[AC]/2$\\ \hline
+    \multicolumn{4}{|l|}{\textit{Modificación de direcciones}} \\ \hline
+    00010010 & 0x12       &  STOR M(X,8:19)   & $\text{M(X)}_{8:19}\leftarrow[AC]_{28:39}$\\
+    00010011 & 0x13       &  STOR M(X,28:39)  & $\text{M(X)}_{28:39}\leftarrow[AC]_{28:39}$\\
     \hline
   \end{tabular}
 \end{table}
@@ -156,20 +176,23 @@ RTL.
 1. ¿Qué resultado se tiene al final en el registro del acumulador?
 
    Respuesta:
-   $[AC] \leftarrow ???$
+   $[AC] \leftarrow 0000000003$
 
 2. ¿Se sobrescribe algún registro como resultado de la ejecución? Si
    es verdadero, indique qué registro y con qué valor.
    Respuesta:
-   - $[940] \leftarrow ???$
-   - $[941] \leftarrow ???$
-   - $[AC] \leftarrow ???$
+   - $[940] \leftarrow 0000000003$
+   - $[941] \leftarrow 0000000006$
+   - $[AC] \leftarrow 0000000003$
 
 3. ¿Cuál es el valor del bit de Carry? ¿Qué operación modifica el bit?
    Respuesta:
-   - $Carry = ???$
-
-   - 
+   - $Carry = 1$
+ 
+   - Lo genera la instrucción \textbf{SUB M(941)} en la dirección \texttt{0x300 der}. La resta
+     se ejecuta internamente como suma en complemento a 2: $0101 + 1110 = 10011$, cuyo
+     carry-out del bit más significativo es \textbf{1}. Aunque LSH también desplaza bits,
+     la bandera de carry aritmético queda fijada por esta operación de sustracción.
 
 *** Código RTL
 
@@ -177,7 +200,13 @@ Escriba en notación de transferencia de registros el programa que
 ejecuta el computador IAS.
 
  - $[AC] \leftarrow [940]$
- - ...
+ - $[AC] \leftarrow [AC] - [941]$
+ - $[940] \leftarrow [AC]$
+ - $[AC] \leftarrow 2 \times [AC]$
+ - $[941] \leftarrow [AC]$
+ - $[AC] \leftarrow -[940]$
+ - $[940] \leftarrow [AC]$
+ - $\text{HALT}$
 
 
 *** Código Assembler
@@ -185,7 +214,14 @@ ejecuta el computador IAS.
 Escriba el código Assembler del programa que ejecuta el computador IAS.
 
 #+begin_src
-LOAD M(940)
+LOAD M(940)     ; 0x300 izq -> [AC] = 0000000005
+SUB M(941)      ; 0x300 der -> [AC] = 0000000005 - 0000000002 = 0000000003  (Carry = 1)
+STOR M(940)     ; 0x301 izq -> [940] = 0000000003
+LSH             ; 0x301 der -> [AC] = 0000000003 * 2 = 0000000006
+STOR M(941)     ; 0x302 izq -> [941] = 0000000006
+LOAD -M(940)    ; 0x302 der -> [AC] = -[940] = -0000000003 = FFFFFFFFFD
+STOR M(940)     ; 0x303 izq -> [940] = FFFFFFFFFD
+HALT            ; 0x303 der -> fin del programa
 
 #+end_src
 
@@ -193,27 +229,28 @@ LOAD M(940)
 
 Complete la información de los integrantes del grupo.
 
-|-----------------+-------------------------+-------------|
-| Nombre          | Email                   | Rol         |
-|-----------------+-------------------------+-------------|
-|                 |                         |             |
-|                 |                         |             |
-|                 |                         |             |
-|-----------------+-------------------------+-------------|
+|------------------+-----------------------------+-------------|
+| Nombre           | Email                       | Rol         |
+|------------------+-----------------------------+-------------|
+| Anthonny Almeida | anthonny.almeida@epn.edu.ec | Líder       |
+| Micaela Sagñay   | micaela.sagñay@epn.edu.ec   | Colaborador |
+| Jhanavi Molina   | jhanavi.molina@epn.edu.ec   | Colaborador |
+| Damian Haro      | damian.haro@epn.edu.ec      | Colaborador |
+|------------------+-----------------------------+-------------|
 
-* Verificación de Entregables [0%]
+* Verificación de Entregables [100%]
 
 Ejecute ~C-c C-c~ sobre los ítems de tarea según se hayan cumplido o
 no. Si un ítem no pudo realizarse, anote en la sección de problemas
 las razones.
 
-- [ ] Tabla de instrucciones IAS completada.
-- [ ] Preguntas del ejercicio respondidas.
-- [ ] Código RTL completo.
-- [ ] Código Assembler completo.
-- [ ] Revisión de ortografía con ~ispell-buffer~.
-- [ ] Exportación a PDF con ~M-x org-latex-export-to-pdf~.
-- [ ] Subir al aula virtual archivo ~.org~ y ~.pdf~.
+- [X] Tabla de instrucciones IAS completada.
+- [X] Preguntas del ejercicio respondidas.
+- [X] Código RTL completo.
+- [X] Código Assembler completo.
+- [X] Revisión de ortografía con ~ispell-buffer~.
+- [X] Exportación a PDF con ~M-x org-latex-export-to-pdf~.
+- [X] Subir al aula virtual archivo ~.org~ y ~.pdf~.
 
 ** Problemas con la tarea / logísticos
 
