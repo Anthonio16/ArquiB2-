@@ -4,9 +4,9 @@
 #+options: inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
 #+options: tasks:t tex:t timestamp:t title:t toc:nil todo:t |:t
 #+title: Taller de Comandos Linux
-#+date: 2024-07-
-#+author: COLOQUE SU NOMBRE
-#+email: lenin.falconi@epn.edu.ec
+#+date: 2026-06-24
+#+author: Anthonny Almeida
+#+email: anthonny.almeida@epn.edu.ec
 #+language: Español
 #+select_tags: export
 #+exclude_tags: noexport

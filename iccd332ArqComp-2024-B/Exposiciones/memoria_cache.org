@@ -1,0 +1,1878 @@
+# -*- coding: utf-8 -*-
+# ============================================================
+#  ARCHIVO        : memoria_cache.org
+#  PRESENTACIÓN   : Estructura del Sistema de Memoria y Caché
+#  MATERIA        : Arquitectura de Computadores
+#  REFERENCIA     : Stallings, W. (2022). Computer Organization
+#                   and Architecture, 11ª Ed., Caps. 4, 5 y 6.
+#  HERRAMIENTA    : org-re-reveal + reveal.js 4.5
+#  EXPORTAR CON   : M-x org-re-reveal-export-to-html
+#  MODO ORADOR    : Presionar 'S' durante la presentación
+#  NAVEGACIÓN     : → siguiente  |  ↓ sub-diap  |  S notas
+# ============================================================
+
+#+TITLE: Estructura del Sistema de Memoria y Memoria Caché
+#+SUBTITLE: Arquitectura de Computadores · Stallings 11ª Ed. · Caps. 4–6
+#+AUTHOR: Grupo 4 — Arquitectura de Computadores
+#+DATE: Junio 2026
+#+OPTIONS: toc:nil num:nil timestamp:nil
+#+REVEAL_ROOT: https://cdn.jsdelivr.net/npm/reveal.js@4.5.0
+#+REVEAL_THEME: night
+#+REVEAL_TRANS: convex
+#+REVEAL_SPEED: default
+#+REVEAL_PLUGINS: (highlight notes zoom search)
+#+REVEAL_INIT_OPTIONS: slideNumber: 'c/t', progress: true, history: true, center: true, touch: true, hash: true, controlsLayout: 'bottom-right', backgroundTransition: 'fade', defaultTiming: 120, totalTime: 2400
+#+REVEAL_EXTRA_CSS: ./custom.css
+#+REVEAL_HLEVEL: 2
+#+REVEAL_DEFAULT_FRAG_STYLE: appear
+#+REVEAL_HEAD_PREAMBLE: <meta name="description" content="Memoria y Caché — Arquitectura de Computadores"/>
+
+# ============================================================
+#  DIAPOSITIVA 1 — TÍTULO
+# ============================================================
+* Estructura del Sistema de Memoria y Memoria Caché
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:reveal_extra_attr: data-timing="15"
+:END:
+
+#+BEGIN_EXPORT html
+<p style="font-size:0.8em; color:#7ecfff; margin:0;">
+  Arquitectura de Computadores
+</p>
+<p style="font-size:0.65em; color:#aaa; margin-top:6px;">
+  Stallings, W. (2022). <em>Computer Organization and Architecture</em>,
+  11ª Ed., Caps. 4, 5 y 6.
+</p>
+<hr style="border-color:#2a4a6a; margin: 18px 0;"/>
+<table style="width:80%; margin:0 auto; font-size:0.60em; color:#ccc; text-align:center;">
+  <tr>
+    <td>🧑‍💻 Integrante 1<br/><strong style="color:#f0c040;">Rompehielo &amp; Localidad</strong></td>
+    <td>📐 Integrante 2<br/><strong style="color:#7ecfff;">Características &amp; Jerarquía</strong></td>
+    <td>⚡ Integrante 3<br/><strong style="color:#a8e6cf;">Principios de Caché</strong></td>
+    <td>🎯 Integrante 4<br/><strong style="color:#ff7675;">Políticas &amp; Reto</strong></td>
+  </tr>
+</table>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — APERTURA (30 s)
+Saludar al público, presentar a los cuatro integrantes por nombre y su
+rol. Decir: "Hoy vamos a explorar por qué su laptop no explota aunque
+la RAM sea mil veces más lenta que el procesador. La respuesta está en
+la jerarquía de memoria y en la caché."  Pasar a la agenda.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 2 — AGENDA
+# ============================================================
+* Hoja de Ruta
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<div style="display:flex; gap:14px; justify-content:center;
+            flex-wrap:wrap; margin-top:10px;">
+
+  <div style="background:#131f30; border:2px solid #f0c040;
+              border-radius:10px; padding:12px 18px; flex:1;
+              min-width:160px; font-size:0.62em; text-align:left;">
+    <div style="font-size:1.7em;">🎯</div>
+    <div style="color:#f0c040; font-weight:700; font-size:1.1em;">FASE 1</div>
+    <div style="color:#ddd;">Rompehielo<br/>Principio de Localidad</div>
+    <div style="color:#888; font-size:0.85em; margin-top:4px;">~ 8 min</div>
+  </div>
+
+  <div style="background:#131f30; border:2px solid #7ecfff;
+              border-radius:10px; padding:12px 18px; flex:1;
+              min-width:160px; font-size:0.62em; text-align:left;">
+    <div style="font-size:1.7em;">🏗️</div>
+    <div style="color:#7ecfff; font-weight:700; font-size:1.1em;">FASE 2</div>
+    <div style="color:#ddd;">Características &amp;<br/>Jerarquía de Memoria</div>
+    <div style="color:#888; font-size:0.85em; margin-top:4px;">~ 10 min</div>
+  </div>
+
+  <div style="background:#131f30; border:2px solid #a8e6cf;
+              border-radius:10px; padding:12px 18px; flex:1;
+              min-width:160px; font-size:0.62em; text-align:left;">
+    <div style="font-size:1.7em;">⚡</div>
+    <div style="color:#a8e6cf; font-weight:700; font-size:1.1em;">FASE 3</div>
+    <div style="color:#ddd;">Principios y Diseño<br/>de la Memoria Caché</div>
+    <div style="color:#888; font-size:0.85em; margin-top:4px;">~ 12 min</div>
+  </div>
+
+  <div style="background:#131f30; border:2px solid #ff7675;
+              border-radius:10px; padding:12px 18px; flex:1;
+              min-width:160px; font-size:0.62em; text-align:left;">
+    <div style="font-size:1.7em;">🏆</div>
+    <div style="color:#ff7675; font-weight:700; font-size:1.1em;">FASE 4</div>
+    <div style="color:#ddd;">Políticas de Escritura<br/>Reto Hit/Miss</div>
+    <div style="color:#888; font-size:0.85em; margin-top:4px;">~ 10 min</div>
+  </div>
+
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 (30 s)
+Mostrar la agenda y decir: "Cada compañero tiene un rol. Yo arranco con
+un juego rápido para calentar motores. Luego [Nombre 2] construye los
+cimientos teóricos, [Nombre 3] nos mete al núcleo de la caché, y
+[Nombre 4] cierra con un reto práctico donde ustedes participan."
+#+END_NOTES
+
+# ============================================================
+#  ══════════════════════════════════════════════════════════
+#  FASE 1 — ROMPEHIELO Y PRINCIPIO DE LOCALIDAD
+#  Integrante 1  |  Stallings 11ª Ed. pp. 135–138
+#  ══════════════════════════════════════════════════════════
+# ============================================================
+
+* FASE 1
+:PROPERTIES:
+:reveal_background: linear-gradient(135deg, #1a0a00, #3d1500)
+:END:
+
+#+BEGIN_EXPORT html
+<div class="fase-header">
+  <div class="numero">1</div>
+  <h2 style="color:#f0c040; margin:8px 0 4px;">
+    El Rompehielo
+  </h2>
+  <p style="color:#ddd; font-size:0.75em;">
+    Actividad introductoria · Principio de Localidad
+  </p>
+  <p class="integrante">Integrante 1 · Stallings Cap. 4, pp. 135–138</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — PORTADA FASE 1 (10 s)
+Solo presentarse y decir: "¿Listos para el juego?"
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 4 — PREGUNTA ACTIVADORA
+# ============================================================
+* ¿Qué tan rápido es tu computadora?
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<p style="color:#aaa; font-size:0.75em; margin-bottom:20px;">
+  Levanta la mano si sabes la respuesta ✋
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear appear)
+- 🖥️ Un registro del CPU tarda *~0.3 ns* en operar
+- 💾 La RAM tarda *~60–100 ns* en responder
+- 💿 Un SSD NVMe tarda *~100.000 ns* (0.1 ms)
+- 🖴 Un disco duro tarda *~5.000.000 ns* (5 ms)
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box warn" style="margin-top:14px;">
+  ⚠️ <strong>Brecha</strong>: La RAM es <strong>~200 veces</strong>
+  más lenta que los registros.<br/>
+  Sin la caché, el procesador esperaría casi todo el tiempo.
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — ~2 min
+Hacer las preguntas al público ANTES de revelar las respuestas:
+"¿Alguien sabe cuánto tarda en responder la RAM?" → esperar respuestas.
+"¿Y el disco duro comparado con la RAM?" → esperar.
+Cuando reveles el último fragmento, enfatizar la brecha dramática:
+"El CPU es como Ferrari y la RAM es como un ciclista. Sin solución,
+el procesador solo estaría esperando. ¿Cuál es la solución? La caché.
+Pero primero entendamos POR QUÉ funciona."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 5 — EL JUEGO DEL ESCRITORIO
+# ============================================================
+* 🎮 El Juego: Escritorio, Archivero y Biblioteca
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:10px;">
+  Analogía directa de Stallings Cap. 4, p. 137 — Fig. 4.1
+</p>
+<div class="col2">
+  <div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+| Analogía | Componente real |
+|---------------------------+------------------------|
+| 📋 Tu *escritorio* (5 carpetas) | Memoria *Caché* |
+| 🗄️ *Archivero* en la sala (500) | Memoria *Principal* (RAM) |
+| 🏛️ *Biblioteca* (miles) | Disco / Almacenamiento |
+
+#+BEGIN_EXPORT html
+  </div>
+  <div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="font-size:0.62em; text-align:left; margin-top:8px;">
+  <p><strong style="color:#f0c040;">Pregunta al público:</strong></p>
+  <p>📌 Si ya tienes una carpeta en el escritorio y necesitas
+     información de ella de nuevo, ¿vas al archivero?</p>
+  <p style="color:#a8e6cf;">→ <strong>¡No! Ya la tienes cerca.</strong>
+     Esto es <em>localidad temporal</em>.</p>
+  <p style="margin-top:8px;">📌 Cuando vas al archivero, ¿traes
+     también las carpetas vecinas?</p>
+  <p style="color:#a8e6cf;">→ <strong>Probablemente sí.</strong>
+     Esto es <em>localidad espacial</em>.</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+  </div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — ~3 min
+Esta es la dinámica central. PEDIR voluntarios:
+1. "¿Alguien puede ser Bob? Tu trabajo es buscar carpetas."
+2. Designar a alguien como "el archivero" que entrega carpetas lentas.
+3. Narrar: "Bob está escribiendo un informe. Tiene 5 carpetas en
+   su escritorio. Necesita el dato X que ya tiene ahí. ¿Va al
+   archivero?" → NO. Eso es localidad temporal.
+4. "Ahora necesita un dato nuevo. Va al archivero y trae la
+   carpeta Y. Pero también trae las vecinas por si acaso."
+   → Eso es localidad espacial.
+Hacer las dos preguntas de la diapositiva al público real ANTES
+de revelar las respuestas. Esperar participación.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 6 — PRINCIPIO DE LOCALIDAD (DEFINICIÓN)
+# ============================================================
+* Principio de Localidad de Referencia
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="margin-bottom:16px;">
+  <strong>Definición (Stallings, p. 135):</strong><br/>
+  Durante la ejecución de un programa, las referencias a memoria
+  por el procesador — tanto instrucciones como datos — tienden
+  a <em>agruparse</em>. No todas las posiciones de memoria son
+  igualmente probables de ser accedidas en un momento dado.
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="col2">
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+*¿Por qué ocurre?*
+- Bucles: mismas instrucciones una y otra vez
+- Subrutinas: se invocan repetidamente
+- Estructuras de datos: arrays accedidos secuencialmente
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="font-size:0.62em; background:#0d1e30;
+            border-radius:8px; padding:14px; text-align:left;">
+<p><strong style="color:#f0c040;">Denning (1972)</strong> formuló
+   3 afirmaciones:</p>
+<ol style="line-height:1.7;">
+  <li>Las referencias son <strong>no uniformes</strong></li>
+  <li>La distribución cambia <strong>lentamente</strong></li>
+  <li>Pasado reciente ≈ Futuro inmediato
+      <span style="color:#a8e6cf;">(alta correlación)</span></li>
+</ol>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — ~2 min
+Explicar que este principio es el FUNDAMENTO de toda la jerarquía.
+Sin localidad de referencia, la caché no serviría de nada.
+Vincular con el juego anterior: "Bob tendía a usar las mismas
+carpetas (temporal) y buscar las vecinas (espacial). Eso es
+localidad. Y los programas hacen exactamente lo mismo."
+Mencionar que Denning (1972) fue quien lo formalizó matemáticamente.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 7 — LOCALIDAD TEMPORAL
+# ============================================================
+* Localidad Temporal
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box temporal">
+  <strong>Localidad Temporal</strong> (Stallings p. 136):<br/>
+  Si una posición de memoria <code>x</code> fue referenciada en el
+  tiempo <code>t</code>, es <em>probable</em> que vuelva a ser
+  referenciada en un tiempo cercano a <code>t</code>.
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="font-size:0.68em; background:#0d1e30; border-radius:8px;
+            padding:12px 18px; margin:8px 0; text-align:left;">
+<strong style="color:#f0c040;">Ejemplo en código:</strong>
+<pre style="margin:6px 0; color:#a8e6cf; font-size:1em;">
+for (i = 0; i &lt; 1000; i++) {
+    suma += array[i];   ← variable "suma" se usa 1000 veces
+}
+</pre>
+<p style="margin:4px 0;">
+  La variable <code>suma</code> y el contador <code>i</code> son
+  accedidos repetidamente → <strong>alta localidad temporal</strong>.
+</p>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear)
+*Cómo la explota la caché:*
+- Mantiene instrucciones y datos *recientemente usados* en caché
+- Organiza jerarquía de múltiples niveles (L1 → L2 → L3)
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — ~1.5 min
+El ejemplo del bucle es perfecto para la clase. Preguntar:
+"En este for, ¿cuántas veces se lee 'suma'? ¡1000 veces!
+¿Tendría sentido ir a la RAM 1000 veces para buscarla?
+Con caché, la buscamos UNA vez, la traemos y la tenemos
+disponible para las 999 referencias siguientes."
+Dibujar en el aire la idea de "mantener cerca lo que ya usaste".
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 8 — LOCALIDAD ESPACIAL
+# ============================================================
+* Localidad Espacial
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box espacial">
+  <strong>Localidad Espacial</strong> (Stallings p. 136):<br/>
+  Si la posición <code>x</code> es referenciada en el tiempo
+  <code>t</code>, es probable que las posiciones
+  <code>x−k</code> a <code>x+k</code> sean referenciadas en
+  un futuro cercano (para un <code>k</code> relativamente pequeño).
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="font-size:0.68em; background:#0d1e30; border-radius:8px;
+            padding:12px 18px; margin:8px 0; text-align:left;">
+<strong style="color:#f0c040;">Ejemplo en código:</strong>
+<pre style="margin:6px 0; color:#a8e6cf; font-size:1em;">
+for (i = 0; i &lt; N; i++) {
+    resultado[i] = A[i] + B[i];   ← acceso secuencial a arrays
+}
+</pre>
+<p style="margin:4px 0;">
+  Si accedo a <code>A[0]</code>, lo probable es que pronto
+  acceda a <code>A[1]</code>, <code>A[2]</code>...
+  → La caché trae un <em>bloque</em> completo de memoria.
+</p>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear)
+*Cómo la explota la caché:*
+- Transfiere *bloques* completos (no palabras sueltas)
+- Usa mecanismos de *prefetching* (precarga anticipada)
+
+#+BEGIN_NOTES
+INTEGRANTE 1 — ~1.5 min
+Analogía del escritorio: "Cuando Bob va al archivero a buscar la
+carpeta del Proyecto A, ¿qué hace? Trae también las carpetas
+vecinas: presupuesto, cronograma, contactos. Eso es exactamente
+lo que hace la caché: trae un BLOQUE de memoria, no solo el
+byte que pediste."
+Mencionar que el tamaño del bloque (línea de caché) típicamente
+es de 64 bytes en procesadores modernos.
+CIERRE FASE 1: "Con esto ya tienen la intuición. [Nombre 2] va
+a construir ahora la estructura formal."
+#+END_NOTES
+
+# ============================================================
+#  ══════════════════════════════════════════════════════════
+#  FASE 2 — CARACTERÍSTICAS Y JERARQUÍA DE MEMORIA
+#  Integrante 2  |  Stallings 11ª Ed. pp. 141–156
+#  ══════════════════════════════════════════════════════════
+# ============================================================
+
+* FASE 2
+:PROPERTIES:
+:reveal_background: linear-gradient(135deg, #001a2a, #003060)
+:END:
+
+#+BEGIN_EXPORT html
+<div class="fase-header">
+  <div class="numero">2</div>
+  <h2 style="color:#7ecfff; margin:8px 0 4px;">
+    Los Cimientos y la Jerarquía
+  </h2>
+  <p style="color:#ddd; font-size:0.75em;">
+    Características de la Memoria · La Pirámide
+  </p>
+  <p class="integrante">Integrante 2 · Stallings Cap. 4, pp. 141–156</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — PORTADA FASE 2 (10 s)
+Presentarse y conectar: "Ahora que entendemos por qué la localidad
+importa, veamos CÓMO organizamos la memoria para explotarla."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 10 — CARACTERÍSTICAS CLAVE
+# ============================================================
+* Características de los Sistemas de Memoria
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Stallings, Tabla 4.1 — p. 141 — Dimensiones clave de clasificación
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+            font-size:0.60em; margin:0 auto;">
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="flex:1; min-width:140px;">
+  <strong style="color:#7ecfff;">📍 Ubicación</strong><br/>
+  <em>Interna:</em> Registros, Caché, RAM<br/>
+  <em>Externa:</em> Disco, Cinta (vía I/O)
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="flex:1; min-width:140px;">
+  <strong style="color:#7ecfff;">📦 Capacidad</strong><br/>
+  Interna: bytes o palabras<br/>
+  Externa: megabytes / terabytes
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="flex:1; min-width:140px;">
+  <strong style="color:#7ecfff;">🔄 Unidad de Transferencia</strong><br/>
+  Interna: <em>word</em> (32/64 bits)<br/>
+  Externa: <em>bloques</em> (sectores)
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="flex:1; min-width:140px;">
+  <strong style="color:#7ecfff;">⏱️ Rendimiento</strong><br/>
+  Tiempo de acceso<br/>
+  Tiempo de ciclo<br/>
+  Tasa de transferencia
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="flex:1; min-width:140px;">
+  <strong style="color:#7ecfff;">🔌 Características Físicas</strong><br/>
+  Volátil / No volátil<br/>
+  Borrable / No borrable
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — ~2 min
+Ir revelando cada caja y explicar brevemente:
+- Ubicación: "Los registros son internos al CPU, el disco es externo."
+- Capacidad: "Más capacidad → más lento y más barato por bit."
+- Unidad de transferencia: "La caché no te da un solo byte, te da un
+  bloque completo — típicamente 64 bytes."
+- Rendimiento: Destacar que hay DOS tiempos: acceso y ciclo.
+- Volátil/No volátil: "La RAM pierde todo al apagar, el disco no."
+Preguntar al público: "¿La RAM es volátil o no volátil?"
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 11 — MÉTODOS DE ACCESO
+# ============================================================
+* Métodos de Acceso a Memoria
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:6px;">
+  Stallings p. 141 — El método determina el tiempo de acceso
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div style="display:flex; gap:10px; flex-wrap:wrap;
+            font-size:0.60em; justify-content:center;">
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="background:#0d1e30; border:2px solid #8e44ad; border-radius:8px;
+            padding:10px 14px; flex:1; min-width:130px;">
+  <div style="font-size:1.6em; text-align:center;">📼</div>
+  <div style="color:#8e44ad; font-weight:700; text-align:center;">Secuencial</div>
+  <hr style="border-color:#2a2a4a;"/>
+  <p>Acceso en <strong>orden lineal</strong> estricto. Tiempo variable.</p>
+  <p style="color:#888;">Ejemplo: Cinta magnética</p>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="background:#0d1e30; border:2px solid #2980b9; border-radius:8px;
+            padding:10px 14px; flex:1; min-width:130px;">
+  <div style="font-size:1.6em; text-align:center;">💿</div>
+  <div style="color:#2980b9; font-weight:700; text-align:center;">Directo</div>
+  <hr style="border-color:#1a3a5a;"/>
+  <p>Cabezal va a <strong>vecindad</strong> y luego busca. Tiempo variable.</p>
+  <p style="color:#888;">Ejemplo: Disco duro (HDD)</p>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="background:#0d1e30; border:2px solid #27ae60; border-radius:8px;
+            padding:10px 14px; flex:1; min-width:130px;">
+  <div style="font-size:1.6em; text-align:center;">🧠</div>
+  <div style="color:#27ae60; font-weight:700; text-align:center;">Aleatorio</div>
+  <hr style="border-color:#1a3a5a;"/>
+  <p>Cada dirección tiene mecanismo propio. Tiempo <strong>constante</strong>.</p>
+  <p style="color:#888;">Ejemplo: RAM, Caché</p>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="background:#0d1e30; border:2px solid #f0c040; border-radius:8px;
+            padding:10px 14px; flex:1; min-width:130px;">
+  <div style="font-size:1.6em; text-align:center;">🔍</div>
+  <div style="color:#f0c040; font-weight:700; text-align:center;">Asociativo</div>
+  <hr style="border-color:#3a3a1a;"/>
+  <p>Búsqueda por <strong>contenido</strong>, no por dirección. Tiempo constante.</p>
+  <p style="color:#888;">Ejemplo: Caché asociativa</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — ~2 min
+Usar la analogía del archivero para cada tipo:
+- Secuencial: "Como buscar en una cinta VHS — tienes que avanzar."
+- Directo: "Como un tocadiscos — el brazo va al surco aproximado,
+  luego gira el disco hasta encontrar exactamente lo que quieres."
+- Aleatorio: "Como el escritorio de Bob — cada posición tiene su
+  dirección exacta. 0 tiempo extra de posicionamiento."
+- Asociativo: "¿Tienes la carpeta con el contrato de Empresa X?
+  No sabes dónde está, pero la describes y el sistema la encuentra."
+Preguntar: "¿Qué método usa la RAM?" → Aleatorio.
+"¿Y la caché?" → Aleatorio o Asociativo.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 12 — TIEMPO DE ACCESO VS CICLO
+# ============================================================
+* Rendimiento: Acceso vs. Ciclo vs. Tasa de Transferencia
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="col2">
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+- 📏 *Tiempo de Acceso* ($T_A$): tiempo desde que se presenta la dirección hasta que el dato está disponible
+- 🔄 *Tiempo de Ciclo* ($T_C$): $T_A$ + tiempo extra de recuperación. Es el mínimo tiempo entre dos accesos consecutivos ($T_C \geq T_A$)
+- 📡 *Tasa de Transferencia* ($R$): para RAM $= 1/T_C$ ; para no-RAM: $T_n = T_A + n/R$
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="background:#0d1e30; border-radius:8px; padding:14px;
+            font-size:0.62em; text-align:left;">
+<p><strong style="color:#f0c040;">¿Por qué T_C &gt; T_A?</strong></p>
+<p>En memorias DRAM, la lectura es <em>destructiva</em>: leer un dato
+   lo borra. El sistema debe <strong>reescribirlo</strong> antes de
+   permitir otro acceso.</p>
+<p style="margin-top:8px;">
+  <strong>Fórmula para no-RAM (Stallings Ec. 4.1):</strong>
+</p>
+<pre style="color:#a8e6cf; margin:4px 0;">
+  T_n = T_A + n/R
+  donde n = bits a transferir
+</pre>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — ~1.5 min
+Dar el ejemplo concreto: "Si la RAM tiene T_A = 60 ns y necesita
+10 ns extra para regenerar, T_C = 70 ns. Aunque el dato llegó en
+60 ns, no puedes hacer otro acceso hasta que pasen 70 ns."
+La fórmula de tasa de transferencia para no-RAM es importante:
+"Si transferimos n=128 bits, T_A = 20 ms, R = 2 Mbps en una cinta:
+T_128 = 20ms + 128/(2×10^6) = 20ms + 0.064ms"
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 13 — LA PIRÁMIDE DE JERARQUÍA (DINÁMICA)
+# ============================================================
+* La Pirámide de la Jerarquía de Memoria
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.60em; color:#aaa; margin:0 0 6px;">
+  Stallings, Fig. 4.6 p. 144 — Click para construir la jerarquía de abajo hacia arriba 🔽→🔼
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="pyramid-wrapper">
+
+  <!-- Registros — aparece ÚLTIMO (idx=7) -->
+  <div class="fragment p-reg" data-fragment-index="7">
+    <span>⚡ Registros del CPU</span>
+    <span class="right-info">~0.3 ns | bytes | Compilador</span>
+  </div>
+
+  <!-- Caché L1 — idx=6 -->
+  <div class="fragment p-l1" data-fragment-index="6">
+    <span>🔴 Caché L1 (SRAM)</span>
+    <span class="right-info">~1 ns | 32–512 kB | Hardware</span>
+  </div>
+
+  <!-- Caché L2/L3 — idx=5 -->
+  <div class="fragment p-l2" data-fragment-index="5">
+    <span>🟡 Caché L2 / L3 (SRAM/eDRAM)</span>
+    <span class="right-info">~3–30 ns | MB | Hardware</span>
+  </div>
+
+  <!-- Memoria Principal — idx=4 -->
+  <div class="fragment p-ram" data-fragment-index="4">
+    <span>🟢 Memoria Principal (DRAM)</span>
+    <span class="right-info">~60–100 ns | GB | S.O.</span>
+  </div>
+
+  <!-- Flash / SSD — idx=3 -->
+  <div class="fragment p-ssd" data-fragment-index="3">
+    <span>🔵 Memoria Flash / SSD</span>
+    <span class="right-info">~50–150 µs | TB | S.O./Usuario</span>
+  </div>
+
+  <!-- Disco Magnético — idx=2 -->
+  <div class="fragment p-disk" data-fragment-index="2">
+    <span>🟣 Disco Magnético (HDD)</span>
+    <span class="right-info">~5–10 ms | TB | S.O./Usuario</span>
+  </div>
+
+  <!-- Cinta — aparece PRIMERO (idx=1) -->
+  <div class="fragment p-tape" data-fragment-index="1">
+    <span>⬛ Cinta Magnética (Offline)</span>
+    <span class="right-info">segundos/min | PB | Usuario</span>
+  </div>
+
+</div>
+<div class="pyramid-legend fragment" data-fragment-index="7">
+  <span>↑ Mayor velocidad · Mayor costo/bit · Menor capacidad</span>
+  <span>Mayor capacidad · Menor costo/bit · Mayor lentitud ↓</span>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — ~3 min  ← DIAPOSITIVA CENTRAL DE ESTA FASE
+DINÁMICA: Construir la pirámide interactuando con el público.
+ANTES de hacer clic, preguntar a la clase:
+  "¿Cuál es el nivel más lento y con más capacidad?"  → clic → Cinta
+  "¿Qué viene por encima?" → clic → Disco
+  "¿Y el almacenamiento más rápido que existe sin RAM?" → clic → SSD
+  "¿La memoria que ve directamente el programa?" → clic → RAM
+  "¿El primer nivel de caché?" → clic → L2/L3
+  "El más cercano al CPU..." → clic → L1
+  "¡Lo más rápido de todo!" → clic → Registros
+Al final: "Cada nivel hacia arriba es ~10x más rápido y ~10x más
+caro por bit. La clave es que el S.O. y el hardware mueven los datos
+AUTOMÁTICAMENTE entre niveles según el principio de localidad."
+Mencionar IBM z13 (Stallings p. 148-149) como ejemplo real: tiene 4
+niveles de caché (L1=96kB, L2=2MB, L3=64MB, L4=480MB eDRAM).
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 14 — HIT RATIO Y RENDIMIENTO
+# ============================================================
+* Rendimiento de la Jerarquía: Hit Ratio
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Stallings, Ec. 4.2 p. 151 — ¿Cuándo vale la pena la jerarquía?
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box hit" style="margin-bottom:10px;">
+  <strong>Tiempo de acceso promedio del sistema</strong> (dos niveles):<br/>
+  <code>T_s = H × T₁ + (1 − H) × (T₁ + T₂)</code><br/>
+  <code>    = T₁ + (1 − H) × T₂</code><br/><br/>
+  <span style="font-size:0.85em;">
+    Donde H = hit ratio (fracción de accesos encontrados en nivel 1)
+  </span>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="font-size:0.65em; background:#0d1e30; border-radius:8px;
+            padding:12px 18px; text-align:left;">
+<strong style="color:#f0c040;">Ejemplo numérico (Stallings p. 145):</strong><br/>
+T₁ = 0.01 µs (caché) &nbsp;&nbsp;|&nbsp;&nbsp; T₂ = 0.1 µs (RAM) &nbsp;&nbsp;|&nbsp;&nbsp; H = 0.95
+<br/><br/>
+T_s = 0.01 + (1 − 0.95) × 0.1
+    = 0.01 + 0.005
+    = <strong style="color:#a8e6cf;">0.015 µs</strong>
+    (mucho más cerca de 0.01 que de 0.1 ✅)
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box warn" style="margin-top:8px; font-size:0.68em;">
+  💡 Con H ≈ 0.9–0.95, el tiempo promedio es <strong>casi igual al
+  tiempo del nivel más rápido</strong>. Esto es lo que hace útil la caché.
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 2 — ~2 min
+Trabajar el ejemplo numérico en voz alta:
+"Si el 95% de los accesos los encontramos en caché (H=0.95),
+pagamos T1=0.01µs. El 5% restante lo pagamos con T1+T2=0.11µs.
+Promedio: 0.015µs. ¡Casi tan rápido como la caché pura!"
+Preguntar: "¿Qué pasaría si H=0.5? El sistema sería mucho más
+lento. Por eso necesitamos alta H."
+"¿Y cómo logramos alta H? Con el principio de localidad. Todo
+conecta."
+CIERRE FASE 2: "Ahora [Nombre 3] nos explica cómo funciona
+POR DENTRO la memoria caché."
+#+END_NOTES
+
+# ============================================================
+#  ══════════════════════════════════════════════════════════
+#  FASE 3 — EL CORAZÓN DE LA CACHÉ
+#  Integrante 3  |  Stallings 11ª Ed. pp. 161–186
+#  ══════════════════════════════════════════════════════════
+# ============================================================
+
+* FASE 3
+:PROPERTIES:
+:reveal_background: linear-gradient(135deg, #001a0a, #003020)
+:END:
+
+#+BEGIN_EXPORT html
+<div class="fase-header">
+  <div class="numero">3</div>
+  <h2 style="color:#a8e6cf; margin:8px 0 4px;">
+    El Corazón de la Caché
+  </h2>
+  <p style="color:#ddd; font-size:0.75em;">
+    Principios · Estructura · Funciones de Mapeo
+  </p>
+  <p class="integrante">Integrante 3 · Stallings Cap. 5, pp. 161–186</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — PORTADA FASE 3 (10 s)
+Presentarse y decir: "Ahora vamos a abrir la caja negra. ¿Cómo
+sabe la caché qué guardar y cómo se organiza internamente?"
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 16 — ¿QUÉ ES LA CACHÉ?
+# ============================================================
+* ¿Qué es la Memoria Caché?
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="margin-bottom:12px;">
+  <strong>Definición (Stallings, p. 161):</strong><br/>
+  La caché está diseñada para combinar el tiempo de acceso de la
+  memoria rápida (cara) con la <em>gran capacidad</em> de la memoria
+  lenta (barata). Contiene una <strong>copia de porciones</strong>
+  de la memoria principal.
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="col2">
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear appear)
+*Terminología esencial:*
+- *Bloque* (Block): unidad mínima de transferencia caché↔RAM
+- *Línea* (Line): espacio en caché que aloja un bloque + control
+- *Etiqueta* (Tag): identifica qué bloque de RAM está en la línea
+- *Acierto / Fallo* (Hit / Miss): dato encontrado o no en caché
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="media-placeholder" style="margin:0;">
+  <div class="icon">🎬</div>
+  <strong>Diagrama: Fig. 5.2 (Stallings p. 162)</strong><br/>
+  Estructura Caché / Memoria Principal<br/>
+  <span style="color:#888;">Mostrar figura del libro aquí</span>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2 min
+Explicar cada término con gestos:
+- Bloque: "Si tu escritorio tiene carpetas, el bloque es como
+  una carpeta completa — no traes una sola hoja, traes la carpeta."
+- Línea: "El espacio físico en el escritorio donde cabe una carpeta."
+- Tag: "La etiqueta que dice 'esta carpeta es la del Proyecto A
+  del Archivero'."
+- Hit/Miss: "¿Encontré lo que buscaba en el escritorio? HIT.
+  ¿No? MISS — voy al archivero."
+Mostrar/señalar la Fig. 5.2 del libro si se tiene disponible.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 17 — OPERACIÓN DE LECTURA
+# ============================================================
+* Principios Básicos: Operación de Lectura
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Stallings, Fig. 5.3 (p. 163) — Flujo de una lectura
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div style="font-size:0.62em; display:flex; gap:16px; align-items:flex-start;">
+<div style="flex:1; text-align:left;">
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear appear appear appear)
+1. CPU genera dirección *RA* de lectura
+2. ¿Está el bloque que contiene *RA* en caché?
+3. *SÍ → HIT:* entregar palabra a CPU directamente (~1 ns)
+4. *NO → MISS:* acceder a memoria principal (~60 ns)
+5. Cargar el bloque completo en una línea de caché
+6. Entregar la palabra pedida al CPU (en paralelo si es posible)
+
+#+BEGIN_EXPORT html
+</div>
+<div style="flex:1;">
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="media-placeholder">
+  <div class="icon">📽️</div>
+  <strong>#+CAPTION: [Insertar GIF: bloque viajando de RAM a caché]</strong><br/>
+  <span style="color:#888; font-size:0.85em;">
+    Reemplazar con GIF animado mostrando<br/>
+    el bloque transfiriéndose de RAM a caché<br/>
+    y luego la palabra al CPU
+  </span>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="font-size:0.75em; margin-top:8px;">
+  💡 <strong>Critical Word First</strong> (Stallings p. 164):<br/>
+  El hardware solicita primero la palabra faltante y la envía
+  al CPU sin esperar que se cargue toda la línea.
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2 min
+Narrar el flujo como una historia:
+"El CPU dice: quiero el byte en la dirección 0x1A3C.
+Primero pregunta a la caché: ¿lo tienes? Si sí, HIT, listo en 1 ns.
+Si no, MISS: va a la RAM, carga un bloque de 64 bytes (no solo 1),
+lo pone en una línea de caché, y le da la palabra al CPU."
+Enfatizar el Critical Word First: "Para no hacer esperar al CPU,
+el sistema entrega PRIMERO la palabra que se pidió, y mientras el
+CPU sigue trabajando, se termina de cargar el resto del bloque."
+Apuntar al placeholder del GIF y decir: "Aquí van a ver el
+diagrama animado de cómo viaja el bloque" (si tienen el GIF preparado).
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 18 — MAPEO DIRECTO
+# ============================================================
+* Función de Mapeo Directo
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:6px;">
+  Stallings p. 168 — La técnica más simple
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="margin-bottom:10px; font-size:0.75em;">
+  <strong>Regla:</strong> Cada bloque de RAM <em>solo puede ir</em>
+  a UNA línea de caché determinada.<br/>
+  Fórmula: <code>línea_caché = bloque_RAM mod m</code>
+  (donde m = número de líneas en caché)
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin:4px 0;">
+  Estructura de dirección — Ejemplo 5.1a (Stallings p. 171):
+  Caché 64kB · Bloques de 4 bytes · Mem. Principal 16MB (24 bits)
+</p>
+<div class="addr-bar">
+  <div class="tag"    style="flex:4;">
+    TAG<br/><span class="label">8 bits (s−r)</span>
+  </div>
+  <div class="line"   style="flex:7;">
+    NÚMERO DE LÍNEA<br/><span class="label">14 bits (r)</span>
+  </div>
+  <div class="word"   style="flex:1;">
+    OFFSET<br/><span class="label">2 bits (w)</span>
+  </div>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+*Ventajas y desventajas:*
+- ✅ Implementación *simple y económica* — hardware minimal
+- ✅ Búsqueda *muy rápida* (una sola línea a verificar)
+- ❌ *Thrashing*: dos bloques que mapean a la misma línea se expulsan mutuamente aunque haya espacio libre
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2.5 min
+Explicar la regla con un ejemplo concreto:
+"Si la caché tiene 16K líneas (m = 16384), el bloque 0 de RAM va
+a la línea 0, el bloque 1 a la línea 1... el bloque 16384 también
+va a la línea 0, el 16385 a la línea 1, etc."
+Para la dirección de 24 bits:
+"Los 2 bits menos significativos dicen qué byte DENTRO del bloque.
+Los 14 del medio dicen a QUÉ LÍNEA del caché. Los 8 más significativos
+son el TAG que identifica cuál de los 256 bloques posibles está ahí."
+El thrashing: "Imagina que accedo alternadamente al bloque 0 y
+al bloque 16384. Ambos van a la línea 0. Cada acceso expulsa al otro.
+Hit ratio = 0%. Eso es thrashing."
+Mostrar la Fig. 5.7 del libro si está disponible.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 19 — MAPEO ASOCIATIVO
+# ============================================================
+* Función de Mapeo Asociativo (Totalmente Asociativo)
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:6px;">
+  Stallings p. 173 — Máxima flexibilidad, mayor costo
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="margin-bottom:10px; font-size:0.75em;">
+  <strong>Regla:</strong> Cualquier bloque de RAM puede ir a
+  <em>cualquier línea</em> de la caché.<br/>
+  La búsqueda compara el TAG <strong>simultáneamente contra
+  todas las líneas</strong> usando memoria CAM.
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin:4px 0;">
+  Estructura de dirección — mismo ejemplo (24 bits, bloques de 4 B):
+</p>
+<div class="addr-bar">
+  <div class="tag"  style="flex:11;">
+    TAG<br/><span class="label">22 bits (s bits)</span>
+  </div>
+  <div class="word" style="flex:1;">
+    OFFSET<br/><span class="label">2 bits (w)</span>
+  </div>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+*Ventajas y desventajas:*
+- ✅ *Elimina el thrashing* — total libertad de colocación
+- ✅ Mayor hit ratio con el mismo tamaño de caché
+- ❌ *Hardware caro y complejo* — necesita CAM para búsqueda en paralelo
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2 min
+"En el mapeo asociativo, el Tag es casi toda la dirección (22 bits).
+No hay campo de número de línea porque el bloque puede estar
+EN CUALQUIER línea. Para encontrarlo, el hardware compara el Tag
+contra TODAS las líneas simultáneamente usando memoria CAM
+(Content-Addressable Memory)."
+Preguntar: "¿Cuántas comparaciones hace el mapeo directo?
+¡Solo una! ¿Y el asociativo? ¡Todas las líneas al mismo tiempo!"
+Explicar el CAM (Stallings p. 171): "Como si 16.000 personas
+buscan su nombre en una lista al mismo tiempo — un solo ciclo."
+"+Flexible − Caro. Este es el trade-off."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 20 — MAPEO ASOCIATIVO POR CONJUNTOS
+# ============================================================
+* Función de Mapeo Asociativo por Conjuntos
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:6px;">
+  Stallings p. 176 — El compromiso óptimo · Más usado en la práctica
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="margin-bottom:8px; font-size:0.72em;">
+  <strong>Regla:</strong> La caché se divide en <code>v</code>
+  <em>conjuntos (sets)</em>, cada uno con <code>k</code> líneas
+  (<em>vías / ways</em>). Un bloque mapea a un conjunto fijo
+  pero puede ir a <em>cualquier línea</em> dentro del conjunto.<br/>
+  Fórmula: <code>conjunto = bloque mod v</code>
+  &nbsp;|&nbsp; m = v × k
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin:4px 0;">
+  Dirección — Ejemplo 5.1c: 2-way set-associative (Stallings p. 178)
+</p>
+<div class="addr-bar">
+  <div class="tag"  style="flex:4;">
+    TAG<br/><span class="label">9 bits (s−d)</span>
+  </div>
+  <div class="set"  style="flex:6;">
+    NÚMERO DE CONJUNTO<br/><span class="label">13 bits (d)</span>
+  </div>
+  <div class="word" style="flex:1;">
+    OFFSET<br/><span class="label">2 bits (w)</span>
+  </div>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="col2" style="font-size:0.62em; margin-top:8px;">
+<div class="concepto-box">
+  <strong>2-way (k=2)</strong>: El más común.
+  Mejora <em>significativamente</em> el hit ratio vs. directo.
+  Con v = m/2 conjuntos.
+</div>
+<div class="concepto-box">
+  <strong>4-way (k=4)</strong>: Mejora modesta adicional.
+  Costo más alto. Retorno disminuyente.
+  (Stallings p. 180, Fig. 5.15)
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2.5 min
+"El asociativo por conjuntos es el mejor de ambos mundos.
+Imagina que la caché es una librería con 8192 estantes (conjuntos),
+cada estante con 2 espacios (2-way). Un libro siempre va al mismo
+estante, pero puede ocupar cualquiera de los 2 espacios."
+Proceso de búsqueda:
+1. "El campo Set dice: ve al conjunto número X."
+2. "Dentro de ese conjunto, compara el Tag contra las k líneas."
+3. "Si hay match en alguna → HIT. Si no → MISS."
+La Fig. 5.15 de Stallings muestra que más de 4-way casi no mejora.
+"¿Por qué la industria usa 4-way o 8-way? Porque más vías = más
+transistores = más área y consumo."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 21 — COMPARATIVA DE MAPEOS
+# ============================================================
+* Comparativa: Las Tres Funciones de Mapeo
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<table class="mapeo-table">
+<thead>
+  <tr>
+    <th>Criterio</th>
+    <th>🔵 Directo</th>
+    <th>🔴 Asociativo</th>
+    <th>🟢 Asoc. por Conjuntos</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Libertad de colocación</td>
+    <td class="worst">Mínima (1 línea)</td>
+    <td class="best">Máxima (todas)</td>
+    <td class="mid">Media (k líneas)</td>
+  </tr>
+  <tr>
+    <td>Hit ratio (mismo tamaño)</td>
+    <td class="worst">Bajo (thrashing)</td>
+    <td class="best">Máximo</td>
+    <td class="mid">Alto (≈ asociativo)</td>
+  </tr>
+  <tr>
+    <td>Complejidad hardware</td>
+    <td class="best">Baja (sin CAM)</td>
+    <td class="worst">Alta (CAM completa)</td>
+    <td class="mid">Media (k comparadores)</td>
+  </tr>
+  <tr>
+    <td>Velocidad de búsqueda</td>
+    <td class="best">Más rápida</td>
+    <td class="mid">Rápida (paralela)</td>
+    <td class="mid">Rápida (k líneas)</td>
+  </tr>
+  <tr>
+    <td>Uso en procesadores reales</td>
+    <td class="mid">L1 simple / antiguo</td>
+    <td class="worst">TLB (pequeños)</td>
+    <td class="best">L1, L2, L3 modernos</td>
+  </tr>
+  <tr>
+    <td>Ejemplo (Stallings Tab. 5.2)</td>
+    <td>Intel 80486 L1</td>
+    <td>Caché TLB</td>
+    <td>Pentium 4, IBM z13</td>
+  </tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box warn" style="font-size:0.65em; margin-top:8px;">
+  💡 Regla práctica: <strong>2-way set-associative</strong> es el
+  mínimo recomendado. <strong>4-way</strong> es el punto óptimo
+  costo/beneficio para L1. L3 usa frecuentemente 16-way o más.
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 3 — ~2 min
+Recorrer la tabla enfatizando la fila de "Hit ratio":
+"Directo tiene el problema del thrashing. Asociativo lo elimina.
+Por conjuntos logra casi lo mismo que asociativo pero con hardware
+mucho más barato."
+Dar ejemplos reales de la Tabla 5.2 (Stallings p. 167):
+- Intel 80486 (1989): L1 8kB, 4-way
+- Pentium 4 (2000): L1 16kB 4-way, L2 512kB 8-way
+- IBM z13 (2015): L1 96/128kB, L3 64MB 16-way, L4 480MB 30-way
+CIERRE FASE 3: "Ahora [Nombre 4] completa el cuadro con las
+políticas de escritura y nos reta con un problema real."
+#+END_NOTES
+
+# ============================================================
+#  ══════════════════════════════════════════════════════════
+#  FASE 4 — POLÍTICAS Y RETO FINAL
+#  Integrante 4  |  Stallings 11ª Ed. pp. 181–186
+#  ══════════════════════════════════════════════════════════
+# ============================================================
+
+* FASE 4
+:PROPERTIES:
+:reveal_background: linear-gradient(135deg, #1a0000, #3d0000)
+:END:
+
+#+BEGIN_EXPORT html
+<div class="fase-header">
+  <div class="numero">4</div>
+  <h2 style="color:#ff7675; margin:8px 0 4px;">
+    Políticas y Reto Final
+  </h2>
+  <p style="color:#ddd; font-size:0.75em;">
+    Sustitución · Escritura · Reto Hit/Miss
+  </p>
+  <p class="integrante">Integrante 4 · Stallings Cap. 5, pp. 181–186</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — PORTADA FASE 4 (10 s)
+Presentarse: "Voy a cubrir las últimas decisiones de diseño y
+luego los pongo a prueba con un ejercicio en tiempo real."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 23 — ALGORITMOS DE SUSTITUCIÓN
+# ============================================================
+* Algoritmos de Sustitución (Reemplazo)
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Stallings p. 181 — ¿Qué línea expulsamos cuando la caché está llena?
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="algo-cards">
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear appear)
+#+BEGIN_EXPORT html
+<div class="algo-card">
+  <div class="title">⏰ LRU</div>
+  <div class="tag-badge">Least Recently Used</div>
+  <p>Expulsa la línea <strong>menos usada recientemente</strong>.
+     Mejor hit ratio. Fácil en 2-way (1 bit USE).</p>
+  <p style="color:#00b894;">⭐ Más usado</p>
+</div>
+
+<div class="algo-card">
+  <div class="title">1️⃣ FIFO</div>
+  <div class="tag-badge">First In, First Out</div>
+  <p>Expulsa la línea que <strong>llegó primero</strong>.
+     Simple (buffer circular). Puede sufrir Anomalía de Bélády.</p>
+  <p style="color:#f0c040;">✓ Simple</p>
+</div>
+
+<div class="algo-card">
+  <div class="title">📉 LFU</div>
+  <div class="tag-badge">Least Frequently Used</div>
+  <p>Expulsa la línea con <strong>menos referencias</strong>
+     acumuladas. Usa contador por línea.</p>
+  <p style="color:#74b9ff;">≈ Raro</p>
+</div>
+
+<div class="algo-card">
+  <div class="title">🎲 RAND</div>
+  <div class="tag-badge">Aleatorio</div>
+  <p>Selección <strong>aleatoria</strong>. Sorprendentemente
+     cerca de LRU en práctica (Smith, 1982).</p>
+  <p style="color:#b2bec3;">○ Simple hw</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — ~2 min
+Explicar cada algoritmo brevemente:
+LRU: "Razona: si no lo usé recientemente, probablemente no lo
+necesite. Para 2-way es trivial: 1 bit por línea."
+FIFO: "El primero en entrar es el primero en salir. Como una cola.
+La anomalía de Bélády es un fenómeno curioso: más caché puede dar
+PEOR hit ratio con FIFO (no con LRU)."
+LFU: "Cuenta referencias. Problema: una línea muy usada al inicio
+nunca se expulsa aunque ya no la uses."
+RAND: "¡Funciona sorprendentemente bien! Smith (1982) mostró que
+es solo ligeramente inferior a LRU. Y el hardware es trivial."
+Pregunta al público: "¿Cuál usarían para la L1 del CPU si
+el hardware debe ser ultrarrápido?" → LRU aproximado o RAND.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 24 — POLÍTICA DE ESCRITURA
+# ============================================================
+* Política de Escritura: Write-Through vs. Write-Back
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Stallings p. 182 — ¿Cuándo actualizamos la RAM?
+</p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="col2">
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="border:2px solid #2980b9; border-radius:8px; padding:12px;
+            font-size:0.62em; background:#0d1e30;">
+  <div style="color:#2980b9; font-weight:700; font-size:1.3em; margin-bottom:6px;">
+    📝 Write-Through
+  </div>
+  <p>Cada escritura actualiza <strong>caché Y RAM simultáneamente</strong>.</p>
+  <p style="color:#00b894;">✅ RAM siempre válida</p>
+  <p style="color:#00b894;">✅ Coherencia simple entre cachés</p>
+  <p style="color:#d63031;">❌ Genera tráfico de bus constante</p>
+  <p style="color:#d63031;">❌ Posible cuello de botella</p>
+  <p style="color:#aaa; font-size:0.9em; margin-top:6px;">
+    Usado en: IBM z13 L1 y L2 (Stallings p. 190)
+  </p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="border:2px solid #d35400; border-radius:8px; padding:12px;
+            font-size:0.62em; background:#0d1e30;">
+  <div style="color:#e67e22; font-weight:700; font-size:1.3em; margin-bottom:6px;">
+    💾 Write-Back (Copy-Back)
+  </div>
+  <p>Escribe <strong>solo en caché</strong>. Marca línea con
+     <em>Dirty Bit</em>. Escribe a RAM solo al expulsar la línea.</p>
+  <p style="color:#00b894;">✅ Mínimo tráfico de bus</p>
+  <p style="color:#00b894;">✅ Mejor rendimiento general</p>
+  <p style="color:#d63031;">❌ RAM puede estar desactualizada</p>
+  <p style="color:#d63031;">❌ Coherencia compleja</p>
+  <p style="color:#aaa; font-size:0.9em; margin-top:6px;">
+    Usado en: IBM z13 L3 y L4 (Stallings p. 191)
+  </p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="font-size:0.62em; margin-top:6px;">
+  <strong>Ejemplo 5.2 (Stallings p. 182):</strong>
+  Línea de 32 bytes, RAM tarda 30 ns/palabra (4B).
+  Write-Back escribe la línea 1 vez al expulsar (8×30 = 240 ns).
+  Write-Through escribe cada vez que modifica. Si se modifica
+  <strong>&gt; 8 veces</strong> antes de expulsar → Write-Back gana.
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — ~2.5 min
+Usar la analogía del cuaderno de borrador (caché) vs. el libro
+oficial (RAM):
+"Write-Through: cada vez que escribes algo en tu borrador,
+inmediatamente copias exactamente lo mismo al libro oficial.
+El libro SIEMPRE está al día."
+"Write-Back: escribes en el borrador con un post-it de 'sucio'.
+Solo pasas al libro oficial cuando necesitas ese espacio del borrador."
+El ejemplo numérico: "Si la línea se escribe solo 1 vez antes de
+expulsarse, Write-Back = 240 ns, Write-Through = 30 ns → WT gana.
+Si se escribe 9 veces: WB = 240 ns, WT = 270 ns → WB gana."
+Mencionar IBM z13: L1 y L2 usan WT (porque tienen alta velocidad
+hacia L3), L3 y L4 usan WB (tráfico hacia RAM más costoso).
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 25 — TAMAÑO DE LÍNEA Y Nº DE CACHÉS
+# ============================================================
+* Tamaño de Línea y Número de Cachés
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<div class="col2">
+<div>
+#+END_EXPORT
+
+*Tamaño de Línea (Line Size)*
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="font-size:0.65em;">
+  Stallings p. 183 — Línea más grande = más localidad espacial,
+  pero más tiempo de transferencia en un MISS. Optimum experimental:
+  <strong>8–64 bytes</strong> (HPC: 64–128 bytes).
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear)
+- 🔼 Línea *grande*: más datos útiles por miss, menos líneas totales
+- 🔽 Línea *pequeña*: menos desperdicio, más líneas disponibles
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+*Número y Tipo de Cachés*
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="font-size:0.65em;">
+  Stallings p. 184 — <strong>Caché Unificada</strong> vs.
+  <strong>Caché Dividida (Split)</strong>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear)
+- *Unificada*: instrucciones + datos juntos. Mejor hit ratio adaptativo
+- *Dividida* (Harvard-style): caché de instrucciones (I-cache) + datos (D-cache). Evita contención con pipelining → *estándar en L1 moderno*
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="concepto-box" style="font-size:0.62em; margin-top:6px;">
+  IBM z13 (Stallings p. 190):<br/>
+  L1: I-cache 96kB + D-cache 128kB <em>(dividida, WT)</em><br/>
+  L2: I-cache 2MB + D-cache 2MB <em>(dividida, WT)</em><br/>
+  L3: 64MB unificada <em>(WB)</em><br/>
+  L4: 480MB unificada <em>(WB)</em>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — ~2 min
+Tamaño de línea: "Si la línea es muy pequeña, el principio de
+localidad espacial no se aprovecha. Si es muy grande, trae datos
+que nunca usarás y cada miss tarda más. 64 bytes es el estándar
+en Intel y AMD modernos."
+Split cache: "La razón es el pipeline. Cuando el CPU está ejecutando
+instrucción N y al mismo tiempo precarga instrucción N+1, necesita
+acceder a la I-cache. Si hay una sola caché y la instrucción N
+también lee datos en ese ciclo, hay CONTENCIÓN. Con cachés separadas,
+instrucciones y datos no compiten."
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 26 — INTRODUCCIÓN AL RETO
+# ============================================================
+* 🏆 El Reto Final
+:PROPERTIES:
+:reveal_background: #1a0505
+:END:
+
+#+BEGIN_EXPORT html
+<div class="reto-header">
+  <p style="color:#fff; font-size:0.75em; margin:0 0 6px;">
+    EJERCICIO PRÁCTICO EN VIVO — Algoritmo FIFO
+  </p>
+  <span class="timer-badge">⏱ 3 minutos</span>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="col2" style="margin-top:12px;">
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+*Parámetros del sistema:*
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+- Caché con *3 marcos* (bloques) inicialmente vacía
+- Algoritmo de sustitución: *FIFO*
+- Secuencia de referencias: *1 → 2 → 3 → 1 → 4 → 1 → 2*
+
+#+BEGIN_EXPORT html
+</div>
+<div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+*¿Qué debes determinar?*
+
+#+ATTR_REVEAL: :frag (appear appear appear)
+- Para cada referencia: ¿es *ACIERTO* (✓) o *FALLO* (✗)?
+- Estado de la caché *tras cada referencia*
+- ¿Qué bloque se expulsa en cada FALLO?
+
+#+BEGIN_EXPORT html
+</div>
+</div>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="text-align:center; margin-top:14px; font-size:0.65em;
+            background:#0d1e30; border-radius:8px; padding:10px;">
+  📋 <strong>Anoten en papel o abren una tabla:</strong>
+  Ref | Marco 1 | Marco 2 | Marco 3 | Resultado<br/>
+  Tienen <strong style="color:#f0c040;">3 minutos</strong> para resolverlo.
+  La solución aparece en la siguiente diapositiva.
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — ~1 min de explicación + 3 min que resuelve la clase
+Leer los parámetros claramente y asegurarse de que todos entendieron:
+"3 marcos = 3 espacios en caché. Empieza vacía. FIFO significa:
+cuando necesito expulsar, saco el que entró PRIMERO."
+"¿Alguien recuerda FIFO de Sistemas Operativos?"
+Iniciar timer visible (usar el teléfono o timer online).
+Caminar por la clase, ayudar si alguien está perdido pero NO dar
+la respuesta. Estimular discusión entre pares.
+Al finalizar los 3 minutos: "¿Cuántos tuvieron más de 2 aciertos?
+¿Alguien llegó a 3?" → luego avanzar a la solución.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 27 — SOLUCIÓN DEL RETO
+# ============================================================
+* 🎯 Solución del Reto — FIFO con 3 Marcos
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<p style="font-size:0.60em; color:#aaa; margin-bottom:6px;">
+  Secuencia: 1 → 2 → 3 → 1 → 4 → 1 → 2 &nbsp;|&nbsp;
+  Caché: 3 marcos vacíos &nbsp;|&nbsp; Algoritmo: FIFO
+</p>
+
+<table class="hitmiss-table">
+<thead>
+  <tr>
+    <th>Ref.</th>
+    <th>Marco 1</th>
+    <th>Marco 2</th>
+    <th>Marco 3</th>
+    <th>Expulsado</th>
+    <th>Resultado</th>
+  </tr>
+</thead>
+<tbody>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>1</strong></td>
+    <td class="cell-new">1</td>
+    <td class="cell-old">—</td>
+    <td class="cell-old">—</td>
+    <td class="cell-old">—</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>2</strong></td>
+    <td>1</td>
+    <td class="cell-new">2</td>
+    <td class="cell-old">—</td>
+    <td class="cell-old">—</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>3</strong></td>
+    <td>1</td>
+    <td>2</td>
+    <td class="cell-new">3</td>
+    <td class="cell-old">—</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>1</strong></td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td class="cell-old">—</td>
+    <td class="cell-hit">✓ ACIERTO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>4</strong></td>
+    <td class="cell-new">4</td>
+    <td>2</td>
+    <td>3</td>
+    <td style="color:#d63031;">1 (más antiguo)</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>1</strong></td>
+    <td>4</td>
+    <td class="cell-new">1</td>
+    <td>3</td>
+    <td style="color:#d63031;">2 (más antiguo)</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+  <tr>
+    <td><strong>2</strong></td>
+    <td>4</td>
+    <td>1</td>
+    <td class="cell-new">2</td>
+    <td style="color:#d63031;">3 (más antiguo)</td>
+    <td class="cell-miss">✗ FALLO</td>
+  </tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div class="col2" style="font-size:0.62em; margin-top:6px;">
+  <div class="concepto-box hit">
+    <strong>Resumen:</strong><br/>
+    Fallos: <span class="rojo">6</span> &nbsp;|&nbsp;
+    Aciertos: <span class="verde">1</span><br/>
+    Hit Ratio: <span class="verde">1/7 ≈ 14.3%</span>
+  </div>
+  <div class="concepto-box warn">
+    ⚠️ <strong>FIFO no considera uso reciente.</strong>
+    Con LRU, la ref. 1 (paso 6) podría haberse protegido
+    por ser reciente → posiblemente mejor hit ratio.
+  </div>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+INTEGRANTE 4 — ~3 min
+Revelar la tabla fila por fila, explicando cada decisión:
+Ref 1: "Fallo — caché vacía, cargamos 1. Cola FIFO: [1]"
+Ref 2: "Fallo — aún hay espacio, cargamos 2. Cola: [1,2]"
+Ref 3: "Fallo — último espacio, cargamos 3. Cola: [1,2,3]"
+Ref 1: "ACIERTO — 1 ya está en caché. Cola sin cambio: [1,2,3]"
+Ref 4: "Fallo — caché llena. FIFO expulsa al PRIMERO EN ENTRAR:
+  el bloque 1 (entró primero). Cola: [2,3,4]. ¡Pero ahora si
+  necesitamos el 1 de nuevo, habrá fallo!"
+Ref 1: "Fallo — 1 fue expulsado. Cargamos 1, expulsamos 2."
+Ref 2: "Fallo — 2 fue expulsado. Cargamos 2, expulsamos 3."
+Resaltar la paradoja: "El bloque 1 que acabábamos de usar en el
+paso 4 fue expulsado en el paso 5. LRU habría expulsado a 3
+(el menos recientemente usado) y el paso 6 habría sido acierto."
+Preguntar: "¿Ven por qué LRU generalmente supera a FIFO?"
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 28 — CONCLUSIONES
+# ============================================================
+* Conclusiones
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<p style="font-size:0.65em; color:#aaa; margin-bottom:8px;">
+  Lo esencial que llevas de esta clase
+</p>
+#+END_EXPORT
+
+#+ATTR_REVEAL: :frag (appear appear appear appear appear)
+1. 🎯 El *Principio de Localidad* (temporal y espacial) hace posible toda la jerarquía de memoria
+2. 🏗️ La jerarquía balancea *velocidad, costo y capacidad* — sin ella el CPU esperaría casi todo el tiempo
+3. ⚡ La caché es transparente al programador pero crítica para el rendimiento — su diseño determina el *hit ratio*
+4. 🔀 *Asociativo por conjuntos* es el mejor compromiso: casi tan flexible como el asociativo puro, casi tan simple como el directo
+5. 📝 *Write-back* minimiza tráfico de bus; *Write-through* maximiza coherencia. Los diseñadores modernos usan ambos en distintos niveles
+
+#+ATTR_REVEAL: :frag appear
+#+BEGIN_EXPORT html
+<div style="text-align:center; margin-top:10px; font-size:0.65em;
+            color:#f0c040; border-top:1px solid #2a4a6a; padding-top:8px;">
+  "A well-designed cache memory is nearly invisible —<br/>
+  and that invisibility is the point."
+  <span style="color:#888;"> — Stallings, Cap. 5</span>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+CUALQUIER INTEGRANTE puede cerrar — se recomienda el Integrante 1 o 4.
+Leer cada conclusión y conectarla con lo visto:
+1 → "Localidad: base de todo. Sin ella, el caché no sirve."
+2 → "La pirámide: velocidad ↑ = costo ↑ = capacidad ↓."
+3 → "La caché no la ves en C++, pero afecta tu código enormemente."
+4 → "Los chips de hoy: 4-way, 8-way, 16-way según el nivel."
+5 → "IBM z13: WT en L1/L2 por velocidad; WB en L3/L4 por eficiencia."
+Invitar preguntas.
+#+END_NOTES
+
+# ============================================================
+#  DIAPOSITIVA 29 — REFERENCIAS
+# ============================================================
+* Referencias
+:PROPERTIES:
+:reveal_background: #0a0f1e
+:END:
+
+#+BEGIN_EXPORT html
+<div style="text-align:left; font-size:0.62em; line-height:2.0;
+            background:#0d1e30; border-radius:10px; padding:16px 24px;">
+<p>
+  <strong style="color:#7ecfff;">[1]</strong>
+  Stallings, W. (2022).
+  <em>Computer Organization and Architecture: Designing for Performance</em>
+  (11th ed.). Pearson.
+  <span style="color:#888;">Caps. 4 (pp. 134–159), 5 (pp. 160–198)</span>
+</p>
+<p>
+  <strong style="color:#7ecfff;">[2]</strong>
+  Denning, P. J. (1972).
+  <em>On modeling program behavior.</em>
+  AFIPS Spring Joint Computer Conference.
+  <span style="color:#888;">— Base del Principio de Localidad</span>
+</p>
+<p>
+  <strong style="color:#7ecfff;">[3]</strong>
+  Smith, A. J. (1982).
+  <em>Cache memories.</em>
+  ACM Computing Surveys, 14(3), 473–530.
+  <span style="color:#888;">— Estudios de hit ratio y políticas</span>
+</p>
+<p>
+  <strong style="color:#7ecfff;">[4]</strong>
+  Lascarro, C. et al. (2016).
+  <em>IBM z13 and IBM z13s Technical Introduction.</em>
+  IBM Redbooks.
+  <span style="color:#888;">— Jerarquía de caché real IBM z13</span>
+</p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div style="text-align:center; margin-top:14px;">
+  <p style="font-size:0.55em; color:#888;">
+    Presentación generada con <strong>Emacs org-re-reveal</strong>
+    + reveal.js 4.5 · Modo Orador: presiona <kbd>S</kbd>
+  </p>
+</div>
+#+END_EXPORT
+
+#+BEGIN_NOTES
+Agradecer al público. Abrir espacio para preguntas.
+Si queda tiempo, invitar a explorar los simuladores interactivos
+referenciados en el libro (Stallings hace referencia a simuladores
+en línea para Cache Mapping y FIFO/LRU).
+#+END_NOTES

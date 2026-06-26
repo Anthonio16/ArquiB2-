@@ -1,0 +1,268 @@
+/* ================================================================
+   custom.css  —  Presentación: Memoria y Caché
+   Arquitectura de Computadores  |  org-re-reveal + reveal.js 4.x
+   ================================================================ */
+
+/* ── Tipografía global ───────────────────────────────────────── */
+.reveal {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 34px;
+}
+
+.reveal h1 { font-size: 1.8em; color: #f0c040; letter-spacing: 1px; }
+.reveal h2 { font-size: 1.3em; color: #7ecfff; }
+.reveal h3 { font-size: 1.05em; color: #a8e6cf; }
+.reveal p, .reveal li { line-height: 1.55; }
+.reveal strong { color: #f0c040; }
+.reveal em   { color: #a8e6cf; font-style: normal; }
+.reveal code { background: #1e2a3a; color: #f8b400; padding: 2px 8px;
+               border-radius: 4px; font-size: 0.85em; }
+
+/* ── Slide de portada de fase ────────────────────────────────── */
+.fase-header { text-align: center; }
+.fase-header .numero {
+  display: inline-block;
+  font-size: 3.5em;
+  width: 1.4em; height: 1.4em;
+  line-height: 1.4em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f0c040, #e07010);
+  color: #111;
+  font-weight: 900;
+  margin-bottom: 0.2em;
+}
+.fase-header .integrante {
+  font-size: 0.7em;
+  color: #aaa;
+  margin-top: 0.4em;
+  font-style: italic;
+}
+
+/* ── Cajas de concepto ───────────────────────────────────────── */
+.concepto-box {
+  border-left: 5px solid #7ecfff;
+  background: rgba(126, 207, 255, 0.08);
+  padding: 0.5em 1em;
+  border-radius: 0 8px 8px 0;
+  margin: 0.5em 0;
+  font-size: 0.85em;
+  text-align: left;
+}
+.concepto-box.temporal { border-color: #f0c040; background: rgba(240,192,64,0.08); }
+.concepto-box.espacial { border-color: #a8e6cf; background: rgba(168,230,207,0.08); }
+.concepto-box.warn     { border-color: #ff7675; background: rgba(255,118,117,0.08); }
+.concepto-box.hit      { border-color: #00b894; background: rgba(0,184,148,0.10); }
+
+/* ── Pirámide de jerarquía de memoria ───────────────────────── */
+.pyramid-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+  margin: 8px auto;
+}
+.pyramid-wrapper > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 0.60em;
+  font-weight: 700;
+  color: #fff;
+  transition: opacity 0.4s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  white-space: nowrap;
+}
+.pyramid-wrapper > div span.right-info {
+  font-weight: 400;
+  font-size: 0.88em;
+  color: rgba(255,255,255,0.80);
+}
+.p-reg  { width: 14%; background: linear-gradient(90deg,#c0392b,#e74c3c); }
+.p-l1   { width: 24%; background: linear-gradient(90deg,#d35400,#e67e22); }
+.p-l2   { width: 36%; background: linear-gradient(90deg,#b7950b,#f1c40f); color:#111; }
+.p-l2 span.right-info { color: rgba(0,0,0,0.65); }
+.p-ram  { width: 50%; background: linear-gradient(90deg,#1e8449,#2ecc71); }
+.p-ssd  { width: 64%; background: linear-gradient(90deg,#1a5276,#2980b9); }
+.p-disk { width: 78%; background: linear-gradient(90deg,#6c3483,#8e44ad); }
+.p-tape { width: 93%; background: linear-gradient(90deg,#4a4a4a,#7f8c8d); }
+
+.pyramid-legend {
+  display: flex;
+  justify-content: space-between;
+  width: 93%;
+  font-size: 0.48em;
+  color: #888;
+  margin-top: 4px;
+  padding: 0 8px;
+}
+
+/* ── Tabla Hit/Miss ──────────────────────────────────────────── */
+.hitmiss-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.70em;
+  margin: 0.5em auto;
+}
+.hitmiss-table th {
+  background: #1e3a5a;
+  color: #7ecfff;
+  padding: 8px 12px;
+  border: 1px solid #2a4a6a;
+  text-align: center;
+}
+.hitmiss-table td {
+  padding: 7px 12px;
+  border: 1px solid #2a3a4a;
+  text-align: center;
+  background: #141e2c;
+}
+.hitmiss-table tr:hover td { background: #1a2840; }
+.cell-hit  { color: #00b894; font-weight: 700; font-size: 1.1em; }
+.cell-miss { color: #d63031; font-weight: 700; font-size: 1.1em; }
+.cell-new  { color: #f0c040; font-weight: 600; }
+.cell-old  { color: #636e72; }
+
+/* ── Tabla de comparativa de mapeos ─────────────────────────── */
+.mapeo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.65em;
+}
+.mapeo-table th {
+  background: #0f2940;
+  color: #a8e6cf;
+  padding: 7px;
+  border: 1px solid #1a3a5a;
+  text-align: center;
+}
+.mapeo-table td {
+  padding: 6px 10px;
+  border: 1px solid #1a3a5a;
+  text-align: center;
+  background: #0d1e30;
+}
+.mapeo-table .best  { color: #00b894; font-weight: 700; }
+.mapeo-table .worst { color: #d63031; }
+.mapeo-table .mid   { color: #f0c040; }
+
+/* ── Filas de dirección de memoria ──────────────────────────── */
+.addr-bar {
+  display: flex;
+  width: 90%;
+  margin: 0.4em auto;
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.65em;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.addr-bar .tag   { background: #8e44ad; color:#fff; padding: 6px 0; }
+.addr-bar .line  { background: #2980b9; color:#fff; padding: 6px 0; }
+.addr-bar .set   { background: #16a085; color:#fff; padding: 6px 0; }
+.addr-bar .word  { background: #27ae60; color:#fff; padding: 6px 0; }
+.addr-bar .label { font-size: 0.75em; display: block; opacity: 0.75; }
+
+/* ── Tarjetas de algoritmos ──────────────────────────────────── */
+.algo-cards {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0.5em 0;
+}
+.algo-card {
+  background: #0d1e30;
+  border: 2px solid #2a4a6a;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.62em;
+  text-align: left;
+  flex: 1;
+  min-width: 140px;
+  max-width: 200px;
+}
+.algo-card .title {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #7ecfff;
+  margin-bottom: 4px;
+}
+.algo-card .tag-badge {
+  display: inline-block;
+  background: #1a3a5a;
+  color: #aaa;
+  font-size: 0.85em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+/* ── Diapositiva de reto ─────────────────────────────────────── */
+.reto-header {
+  background: linear-gradient(135deg, #6c1a1a, #c0392b);
+  border-radius: 8px;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 0.75em;
+  margin-bottom: 0.5em;
+}
+.timer-badge {
+  display: inline-block;
+  background: #f0c040;
+  color: #111;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 1em;
+}
+
+/* ── Badges de fase ──────────────────────────────────────────── */
+.fase-badge {
+  display: inline-block;
+  font-size: 0.45em;
+  background: #1a3a5a;
+  color: #7ecfff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  vertical-align: middle;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Placeholder de media ────────────────────────────────────── */
+.media-placeholder {
+  border: 3px dashed #7ecfff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #7ecfff;
+  font-size: 0.65em;
+  margin: 0.5em auto;
+  background: rgba(126,207,255,0.04);
+}
+.media-placeholder .icon { font-size: 2.5em; margin-bottom: 8px; }
+
+/* ── Utilidades ──────────────────────────────────────────────── */
+.text-center { text-align: center; }
+.text-left   { text-align: left; }
+.small       { font-size: 0.70em; }
+.muted       { color: #636e72; }
+.highlight   { color: #f0c040; font-weight: 700; }
+.verde       { color: #00b894; font-weight: 700; }
+.rojo        { color: #d63031; font-weight: 700; }
+.azul        { color: #74b9ff; }
+
+/* ── Columnas 2-up ───────────────────────────────────────────── */
+.col2 {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  text-align: left;
+}
+.col2 > div { flex: 1; }
+
+.reveal .slides section { padding: 30px 50px; }
