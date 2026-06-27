@@ -5,8 +5,8 @@
 #+options: tasks:t tex:t timestamp:t title:t toc:nil todo:t |:t
 #+title: Taller de Comandos Linux
 #+date: 2026-06-24
-#+author: Anthonny Almeida
-#+email: anthonny.almeida@epn.edu.ec
+#+author: Anthonny Almeida, Micaela Sagñay, Jhanavy Molina, Damian Haro
+#+email: anthonny.almeida@epn.edu.ec, micaela.sagñay@epn.edu.ec, jhanavy.molina@epn.edu.ec, damian.haro@epn.edu.ec
 #+language: Español
 #+select_tags: export
 #+exclude_tags: noexport
@@ -60,13 +60,43 @@ distro de /Linux/ o el /WSL/ configurado para la clase de
 1. Utilice ~cd~ para localizarse en la posición de home de su usuario y
    verifique ejecutando el comando ~pwd~
    #+begin_src shell :exports both
-     
+cd
+pwd
    #+end_src
+
+   #+RESULTS:
+   : /home/anthonio
+
 2. Cree tres directorios denominados FashionData, Train y
    Test. Verifique usando el comando ~ls~
    #+begin_src shell :exports both
-     
+cd
+pwd
+mkdir FashionData Train Test
+ls
    #+end_src
+
+   #+RESULTS:
+   | /home/anthonio             |
+   | ArquiB2G3                  |
+   | clima-quito-hoy.csv        |
+   | EPN-Lectures               |
+   | FashionData                |
+   | get-weather.sh             |
+   | #hola.py#                  |
+   | miniforge3                 |
+   | Miniforge3-Linux-x86_64.sh |
+   | NEWEPN                     |
+   | repositorioArqui           |
+   | TALLER-ENTORNOWSL-G5       |
+   | TALLER-WSL-G5              |
+   | tarea                      |
+   | Test                       |
+   | Train                      |
+   | weather.log                |
+   | weather.py                 |
+   | wget-log                   |
+
 3. Investigue sobre el comando ~wget~ y utilícelo para descargar en
    ~/FashionData los datos de train y test del /Fashion-Mnist desde el
    siguiente enlace: [[https://github.com/zalandoresearch/fashion-mnist][fashion-mnist]]
@@ -83,38 +113,93 @@ distro de /Linux/ o el /WSL/ configurado para la clase de
 
       http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz
    #+begin_src shell :exports both
+cd ~/FashionData
 
+wget http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz
+wget http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz
+wget http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz
+wget http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz
+
+ls
    #+end_src
+
+   #+RESULTS:
+   | t10k-images-idx3-ubyte.gz  |
+   | t10k-labels-idx1-ubyte.gz  |
+   | train-images-idx3-ubyte.gz |
+   | train-labels-idx1-ubyte.gz |
+
 4. Utilice el comando ~mv~ de manera recursiva para pasar los datos de
    entrenamiento a la carpeta ~/Train
    #+begin_src shell :exports both
-
+mv ~/FashionData/train-* ~/Train/
+ls ~/Train
    #+end_src
+
+   #+RESULTS:
+   | train-images-idx3-ubyte.gz |
+   | train-labels-idx1-ubyte.gz |
+
 5. Utilice el comando ~mv~ de manera recursiva para pasar los datos de
    prueba a la carpeta ~/Test
    #+begin_src shell :exports both
-
+mv ~/FashionData/t10k-* ~/Test/
+ls ~/Test
    #+end_src
+
+   #+RESULTS:
+   | t10k-images-idx3-ubyte.gz |
+   | t10k-labels-idx1-ubyte.gz |
+
 6. Verifique que la carpeta FashionData está vacía
    #+begin_src shell :exports both
-
+ls ~/FashionData
    #+end_src
+
+   #+RESULTS:
+
 7. Los archivos anteriores están comprimidos. Investigue como
    descomprimir usando el comando ~tar~. Si es necesario realice la
    instalación del comando. Descomprima los archivos en sus
    respectivas carpetas. Apunte el comando utilizado para la descompresión.
    #+begin_src shell :exports both
-
+sudo apt install gzip
+gunzip ~/Train/*.gz
+gunzip ~/Test/*.gz
+ls ~/Train
+ls ~/Test
    #+end_src
+
+   #+RESULTS:
+   | train-images-idx3-ubyte |
+   | train-labels-idx1-ubyte |
+   | t10k-images-idx3-ubyte  |
+   | t10k-labels-idx1-ubyte  |
+
 8. Una vez completa la descompresión, elimine los archivos
    .gz. Verifique las carpetas finales usando ~ls~
    #+begin_src shell :exports both
-
+mv ~/Train ~/FashionData/
+mv ~/Test ~/FashionData/
    #+end_src
+
+   #+RESULTS:
+
 9. Mueva recursivamente las carpetas ~/Train y ~/Test dentro de ~/FashionData
    #+begin_src shell :exports both
-
+tree ~/FashionData
    #+end_src
+
+   #+RESULTS:
+   | /home/anthonio/FashionData |                         |                        |       |
+   | ├──                        | Test                    |                        |       |
+   | │                          | ├──                     | t10k-images-idx3-ubyte |       |
+   | │                          | └──                     | t10k-labels-idx1-ubyte |       |
+   | └──                        | Train                   |                        |       |
+   | ├──                        | train-images-idx3-ubyte |                        |       |
+   | └──                        | train-labels-idx1-ubyte |                        |       |
+   |                            |                         |                        |       |
+   | 3                          | directories,            | 4                      | files |
    
 10. Se desea realizar un registro climatológico de la ciudad de
     Quito. Para esto, escriba un script de Python/Java que permita
@@ -134,12 +219,121 @@ distro de /Linux/ o el /WSL/ configurado para la clase de
        y escriba los resultados en /clima-quito-hoy.csv/
        
        #+begin_src python :exports both
+import requests
+import csv
+import os
+from datetime import datetime
 
+# Configuración
+API_KEY = "a13f7ffcd911a866d00d1edce4b1bc1c"
+LAT     = -0.2299
+LON     = -78.5249
+URL     = (
+    f"https://api.openweathermap.org/data/2.5/weather"
+    f"?lat={LAT}&lon={LON}&appid={API_KEY}&units=metric&lang=es"
+)
+ARCHIVO = os.path.expanduser("~/clima-quito-hoy.csv")
+
+# Consultar la API
+response = requests.get(URL)
+if response.status_code != 200:
+    print(f"Error al consultar la API: {response.status_code}")
+    exit(1)
+
+data = response.json()
+
+# Extraer campos
+timestamp   = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+temperatura = data["main"]["temp"]
+sensacion   = data["main"]["feels_like"]
+humedad     = data["main"]["humidity"]
+presion     = data["main"]["pressure"]
+descripcion = data["weather"][0]["description"]
+viento      = data["wind"]["speed"]
+
+# Escribir en CSV (agrega fila en cada ejecución)
+archivo_existe = os.path.isfile(ARCHIVO)
+with open(ARCHIVO, "a", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    if not archivo_existe:
+        writer.writerow([
+            "timestamp", "temperatura_C", "sensacion_termica_C",
+            "humedad_%", "presion_hPa", "descripcion", "viento_m_s"
+        ])
+    writer.writerow([timestamp, temperatura, sensacion, humedad, presion, descripcion, viento])
+
+print(f"[{timestamp}] Guardado: {temperatura}°C, {humedad}% humedad, {descripcion}")
        #+end_src
+
+       #+RESULTS:
+       : None
+
     3. Desarrollar un ejecutable /get-weather.sh/ para ejecutar el
        programa Python/Java.
        #+begin_src shell :exports both
+#!/bin/bash
+
+cd /home/anthonio/
+/usr/bin/python3 /home/anthonio/weather.py >> /home/anthonio/weather.log 2>&1
        #+end_src
     4. Configurar Crontab para la adquisición de datos. Escriba el
        comando configurado.
-       
+       */5 * * * * /home/anthonio/get-weather.sh
+
+       #+begin_src shell :exports both
+cat ~/clima-quito-hoy.csv
+       #+end_src
+
+       #+RESULTS:
+       | 2026-06-24 10:00:51 | 16.69 | 15.67 | 48 | 1014 | algo de nubes   |  1.6 |
+       | 2026-06-24 10:35:49 | 18.22 | 17.27 | 45 | 1013 | nubes dispersas | 2.44 |
+       | 2026-06-24 10:40:02 | 18.22 | 17.27 | 45 | 1013 | nubes dispersas | 2.44 |
+       | 2026-06-24 19:45:02 | 11.97 | 11.62 | 92 | 1015 | lluvia ligera   | 0.62 |
+       | 2026-06-24 19:50:02 | 11.97 | 11.62 | 92 | 1015 | lluvia ligera   | 0.62 |
+       | 2026-06-24 19:55:02 | 12.14 | 11.81 | 92 | 1015 | lluvia ligera   | 0.64 |
+       | 2026-06-24 20:00:02 | 12.14 | 11.81 | 92 | 1015 | lluvia ligera   | 0.64 |
+       | 2026-06-24 20:05:02 | 11.96 | 11.61 | 92 | 1015 | lluvia ligera   | 0.62 |
+       | 2026-06-24 20:10:01 | 11.96 | 11.61 | 92 | 1015 | lluvia ligera   | 0.62 |
+       | 2026-06-24 20:15:02 |  8.99 |  8.99 | 99 | 1013 | lluvia ligera   | 1.11 |
+       | 2026-06-24 20:30:07 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 20:35:03 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 20:40:02 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 20:45:02 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 20:50:02 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 20:55:02 | 11.03 | 10.56 | 91 | 1017 | nubes dispersas | 0.99 |
+       | 2026-06-24 21:50:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 21:55:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:00:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:05:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:10:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:15:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:20:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:25:02 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:30:01 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:35:01 | 10.31 |  9.75 | 90 | 1018 | nubes dispersas | 1.31 |
+       | 2026-06-24 22:40:02 |  9.43 |  8.99 | 90 | 1018 | nubes dispersas | 1.51 |
+       | 2026-06-24 22:45:02 |  9.43 |  8.99 | 90 | 1018 | nubes dispersas | 1.51 |
+       | 2026-06-24 22:50:02 |  9.43 |  8.99 | 90 | 1018 | nubes dispersas | 1.51 |
+       | 2026-06-24 22:55:02 |  9.57 |  9.13 | 90 | 1018 | nubes dispersas | 1.53 |
+       | 2026-06-26 18:05:03 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:10:02 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:15:01 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:20:02 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:25:02 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:30:02 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:35:02 | 13.86 |    13 | 65 | 1014 | lluvia ligera   | 2.51 |
+       | 2026-06-26 18:40:01 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 18:45:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 18:50:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 18:55:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 19:00:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 19:05:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 19:10:02 | 12.44 | 11.54 | 69 | 1016 | muy nuboso      | 1.81 |
+       | 2026-06-26 20:20:02 | 11.77 | 10.86 | 71 | 1017 | muy nuboso      | 2.03 |
+       | 2026-06-26 20:25:02 | 11.77 | 10.86 | 71 | 1017 | muy nuboso      | 2.03 |
+       | 2026-06-26 20:30:02 | 11.77 | 10.86 | 71 | 1017 | muy nuboso      | 2.03 |
+       | 2026-06-26 20:35:03 | 11.77 | 10.86 | 71 | 1017 | muy nuboso      | 2.03 |
+       | 2026-06-26 20:40:02 | 11.77 | 10.86 | 71 | 1017 | muy nuboso      | 2.03 |
+       | 2026-06-26 20:45:03 | 10.99 | 10.05 | 73 | 1018 | nubes dispersas | 2.07 |
+       | 2026-06-26 20:47:54 | 10.99 | 10.05 | 73 | 1018 | nubes dispersas | 2.07 |
+       | 2026-06-26 20:50:03 | 10.99 | 10.05 | 73 | 1018 | nubes dispersas | 2.07 |
